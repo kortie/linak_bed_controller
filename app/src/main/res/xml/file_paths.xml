@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 로그 zip 공유 전용 (LogExporter). 캐시의 exports/ 밖은 노출하지 않는다. -->
+<paths>
+    <cache-path
+        name="exports"
+        path="exports/" />
+</paths>

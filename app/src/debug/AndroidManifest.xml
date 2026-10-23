@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- debug 빌드 전용: Protocol Lab(실기기 프로토콜 실측 도구), 가상 침대, 원시 BLE 스캔 권한 -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_SCAN"
+        android:usesPermissionFlags="neverForLocation" />
+
+    <application>
+        <activity
+            android:name=".protolab.ProtocolLabActivity"
+            android:exported="true"
+            android:label="@string/protolab_title">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".simbed.SimBedActivity"
+            android:exported="true"
+            android:label="@string/simbed_title">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
