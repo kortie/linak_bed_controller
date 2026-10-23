@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 알림 작은 아이콘 (24dp, 흰색 실루엣): 앱 아이콘 리모컨을 축소 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <group
+        android:scaleX="0.3667"
+        android:scaleY="0.3667"
+        android:translateX="-7.8"
+        android:translateY="-7.8">
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:fillType="evenOdd"
+            android:pathData="M51,24h6a12,12 0,0 1,12 12v36a12,12 0,0 1,-12 12h-6a12,12 0,0 1,-12 -12v-36a12,12 0,0 1,12 -12zM54,36L63,48H45zM45,60H63L54,72z" />
+    </group>
+</vector>

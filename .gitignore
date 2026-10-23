@@ -1,0 +1,19 @@
+.gradle/
+.kotlin/
+build/
+local.properties
+.idea/
+*.iml
+captures/
+# 사내 GalaxyEnv init 스크립트가 빌드 중 생성하는 로그
+.galaxy/
+
+# 릴리스 서명 키 (docs/play/release-checklist.md) — 절대 커밋하지 않는다
+keystore.properties
+*.jks
+*.keystore
+
+# 설계·스펙 문서와 Claude 작업 설정은 로컬에만 둔다 (README.md만 저장소에 올림)
+docs/
+CLAUDE.md
+.claude/

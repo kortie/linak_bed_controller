@@ -1,0 +1,29 @@
+# 기본 규칙(buildUponDefaultConfig) 위에 프로젝트 차이만 적는다.
+build:
+  maxIssues: 0
+
+style:
+  MagicNumber:
+    # 매직 넘버 금지(linak-conventions §2). Compose 레이아웃 수치와 테스트는 제외.
+    ignoreAnnotated: ['Composable', 'Preview']
+    ignoreEnums: true # PresetSlot.P3(3)처럼 enum 생성자 인자는 이름이 곧 의미
+    excludes: ['**/test/**', '**/testFixtures/**']
+  MaxLineLength:
+    maxLineLength: 140 # .editorconfig(ktlint)와 같게
+  UnusedPrivateMember:
+    ignoreAnnotated: ['Preview']
+
+naming:
+  FunctionNaming:
+    ignoreAnnotated: ['Composable', 'Test']
+    excludes: ['**/test/**']
+  TopLevelPropertyNaming:
+    constantPattern: '[A-Z][_A-Z0-9]*'
+
+complexity:
+  LongParameterList:
+    ignoreAnnotated: ['Composable']
+  TooManyFunctions:
+    ignorePrivate: true # 공개 API 크기만 본다. 작은 private 도우미로 나누는 것은 권장
+  CyclomaticComplexMethod:
+    ignoreSimpleWhenEntries: true # UDF의 onAction 단일 분기(linak-conventions §6)

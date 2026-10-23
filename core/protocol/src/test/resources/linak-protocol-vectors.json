@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "status": "provisional",
+  "notes": [
+    "Linak 침대 BLE 프로토콜 기준 벡터 (ADR-006). 앱(Kotlin)과 향후 브리지 펌웨어가 같은 값을 쓰기 위한 언어 독립 자료.",
+    "값의 출처는 저장소 루트 README.md이며 실기기 미검증. 검증 결과는 docs/spec/hw-findings.md에 기록하고, 이 파일 → 코드 → 테스트 순으로 고친다.",
+    "bytes는 제어 특성에 쓰는 값의 16진수 문자열(소문자, 바이트당 2자리).",
+    "센서 cm는 실수 나눗셈: raw / divisor / scale. README 식의 첫 나눗셈이 정수 나눗셈인지는 미검증."
+  ],
+  "gatt": {
+    "controlService": "99fa0001-338a-1024-8a49-009c0215f78a",
+    "controlCharacteristic": "99fa0002-338a-1024-8a49-009c0215f78a",
+    "sensorService": "99fa0020-338a-1024-8a49-009c0215f78a",
+    "headHeightCharacteristic": "99fa0028-338a-1024-8a49-009c0215f78a",
+    "feetHeightCharacteristic": "99fa0027-338a-1024-8a49-009c0215f78a"
+  },
+  "commands": [
+    { "command": "move", "actuator": "both", "direction": "down", "bytes": "0000" },
+    { "command": "move", "actuator": "both", "direction": "up", "bytes": "0100" },
+    { "command": "move", "actuator": "feet", "direction": "down", "bytes": "0800" },
+    { "command": "move", "actuator": "feet", "direction": "up", "bytes": "0900" },
+    { "command": "move", "actuator": "head", "direction": "down", "bytes": "0a00" },
+    { "command": "move", "actuator": "head", "direction": "up", "bytes": "0b00" },
+    { "command": "stop", "bytes": "ff00" },
+    { "command": "recallPreset", "slot": 1, "bytes": "0e00" },
+    { "command": "recallPreset", "slot": 2, "bytes": "0f00" },
+    { "command": "recallPreset", "slot": 3, "bytes": "0c00" },
+    { "command": "recallPreset", "slot": 4, "bytes": "4400" },
+    { "command": "savePreset", "slot": 1, "bytes": "3800" },
+    { "command": "savePreset", "slot": 2, "bytes": "3900" },
+    { "command": "savePreset", "slot": 3, "bytes": "3a00" },
+    { "command": "savePreset", "slot": 4, "bytes": "4500" },
+    { "command": "light", "action": "on", "bytes": "9200" },
+    { "command": "light", "action": "off", "bytes": "9300" },
+    { "command": "light", "action": "toggle", "bytes": "9400" }
+  ],
+  "sensor": {
+    "calibration": { "headDivisor": 5, "feetDivisor": 6, "scale": 5.0, "speedDivisor": 100.0 },
+    "byteOrder": "little-endian unsigned 16-bit: [heightLo, heightHi, speedLo, speedHi]",
+    "cases": [
+      { "actuator": "head", "payload": "0000", "raw": 0, "cm": 0.0, "speedCmPerMin": null },
+      { "actuator": "head", "payload": "e803", "raw": 1000, "cm": 40.0, "speedCmPerMin": null },
+      { "actuator": "feet", "payload": "e803", "raw": 1000, "cm": 33.333333333, "speedCmPerMin": null },
+      { "actuator": "head", "payload": "8000", "raw": 128, "cm": 5.12, "speedCmPerMin": null },
+      { "actuator": "feet", "payload": "0080", "raw": 32768, "cm": 1092.266666667, "speedCmPerMin": null },
+      { "actuator": "head", "payload": "ffff", "raw": 65535, "cm": 2621.4, "speedCmPerMin": null },
+      { "actuator": "head", "payload": "e80310", "raw": 1000, "cm": 40.0, "speedCmPerMin": null },
+      { "actuator": "head", "payload": "e8031027", "raw": 1000, "cm": 40.0, "speedCmPerMin": 100.0 },
+      { "actuator": "feet", "payload": "e8030000", "raw": 1000, "cm": 33.333333333, "speedCmPerMin": 0.0 },
+      { "actuator": "head", "payload": "", "invalid": true },
+      { "actuator": "feet", "payload": "e8", "invalid": true }
+    ]
+  },
+  "profile": {
+    "moveTiming": { "type": "repeat", "intervalMs": 200 },
+    "presetTiming": { "type": "repeat", "intervalMs": 200 },
+    "lightTiming": { "type": "oneShot" },
+    "writeWithResponse": true
+  }
+}
