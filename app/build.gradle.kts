@@ -11,7 +11,7 @@ android {
     namespace = "dev.linakbed.app"
 
     defaultConfig {
-        applicationId = "com.juanstudio.linakbed"
+        applicationId = "com.juanstudio.bedcontrol"
         versionCode = 1
         versionName = "1.0.0"
 

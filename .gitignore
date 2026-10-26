@@ -17,3 +17,6 @@ keystore.properties
 docs/
 CLAUDE.md
 .claude/
+
+# IDE(VS Code Java 등)가 만드는 컴파일 출력
+bin/

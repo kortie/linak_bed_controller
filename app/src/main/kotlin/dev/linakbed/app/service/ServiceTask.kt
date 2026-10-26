@@ -7,7 +7,7 @@ import dev.linakbed.domain.remote.RemoteRequest
 
 /** [BedForegroundService]에 보내는 작업. 요청 자체는 디스패처가 들고 있고 인텐트에는 requestId만 싣는다. */
 object ServiceTask {
-    const val ACTION_RUN_REMOTE = "com.juanstudio.linakbed.action.RUN_REMOTE"
+    const val ACTION_RUN_REMOTE = "com.juanstudio.bedcontrol.action.RUN_REMOTE"
     const val EXTRA_REQUEST_ID = "request_id"
 
     fun runRemote(
