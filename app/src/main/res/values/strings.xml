@@ -210,4 +210,29 @@
     <string name="home_bed_description">침대 모양</string>
     <string name="home_bed_state">머리 %1$d%% · 발 %2$d%%</string>
     <string name="home_bed_unknown">높이 정보 없음</string>
+
+    <!-- S11 삼성 모드 및 루틴 · 앱 바로가기 (ADR-011) -->
+    <string name="shortcut_preset_1">프리셋 1 이동</string>
+    <string name="shortcut_preset_2">프리셋 2 이동</string>
+    <string name="shortcut_preset_3">프리셋 3 이동</string>
+    <string name="shortcut_preset_4">프리셋 4 이동</string>
+    <string name="shortcut_preset_1_long">침대를 프리셋 1 자세로 이동</string>
+    <string name="shortcut_preset_2_long">침대를 프리셋 2 자세로 이동</string>
+    <string name="shortcut_preset_3_long">침대를 프리셋 3 자세로 이동</string>
+    <string name="shortcut_preset_4_long">침대를 프리셋 4 자세로 이동</string>
+    <string name="shortcut_stop">침대 정지</string>
+    <string name="shortcut_stop_long">침대 움직임 정지</string>
+    <string name="remote_channel_shortcut">모드 및 루틴·바로가기</string>
+    <string name="settings_routines">삼성 모드 및 루틴</string>
+    <string name="settings_routines_desc">루틴의 앱 작업으로 프리셋 이동·정지</string>
+    <string name="routines_enabled">모드 및 루틴으로 침대 움직이기</string>
+    <string name="routines_enabled_desc">끄면 루틴이나 바로가기로 들어온 명령을 실행하지 않고 실행 기록에만 남깁니다.</string>
+    <string name="routines_how_title">설정 방법</string>
+    <string name="routines_step1">1. 설정 → 모드 및 루틴 → 루틴 → +</string>
+    <string name="routines_step2">2. 조건: 시간, 알람 해제 등 원하는 조건</string>
+    <string name="routines_step3">3. 실행: 앱 → 앱 열기 또는 앱 작업 실행 → 침대리모컨 → ‘프리셋 2 이동’ 또는 ‘침대 정지’</string>
+    <string name="routines_step4">4. 프리셋 이동 전에는 큰 취소 화면이 뜹니다. 그대로 두면 침대가 움직입니다.</string>
+    <string name="routines_delay_note">실행 전 대기 시간은 ‘SmartThings 루틴 연동’ 화면의 설정(현재 %1$d초)을 함께 씁니다. 바로가기 이름은 ‘프리셋 N 이동’으로 고정되며, 앱에서 바꾼 프리셋 이름은 루틴 화면에 나오지 않습니다.</string>
+    <string name="routines_launcher_note">홈 화면에서 앱 아이콘을 길게 눌러도 같은 바로가기가 보입니다.</string>
+    <string name="routines_recommended">원활하게 동작하려면</string>
 </resources>

@@ -26,6 +26,7 @@ class DataStoreRemoteSettingsStore(
         val next = transform(settings().first())
         dataStore.edit { prefs ->
             prefs[ENABLED] = next.enabled
+            prefs[APP_SHORTCUTS_ENABLED] = next.appShortcutsEnabled
             prefs[FRESHNESS_MS] = next.freshness.inWholeMilliseconds
             prefs[RATE_LIMIT] = next.rateLimitPerMinute
             prefs[PRE_EXECUTION_DELAY_MS] = next.preExecutionDelay.inWholeMilliseconds
@@ -37,6 +38,7 @@ class DataStoreRemoteSettingsStore(
         val defaults = RemoteSettings()
         return RemoteSettings(
             enabled = prefs[ENABLED] ?: defaults.enabled,
+            appShortcutsEnabled = prefs[APP_SHORTCUTS_ENABLED] ?: defaults.appShortcutsEnabled,
             freshness = prefs[FRESHNESS_MS]?.milliseconds ?: defaults.freshness,
             rateLimitPerMinute = prefs[RATE_LIMIT] ?: defaults.rateLimitPerMinute,
             preExecutionDelay = prefs[PRE_EXECUTION_DELAY_MS]?.milliseconds ?: defaults.preExecutionDelay,
@@ -47,6 +49,7 @@ class DataStoreRemoteSettingsStore(
     companion object {
         private const val FILE_NAME = "remote_settings"
         private val ENABLED = booleanPreferencesKey("enabled")
+        private val APP_SHORTCUTS_ENABLED = booleanPreferencesKey("app_shortcuts_enabled")
         private val FRESHNESS_MS = longPreferencesKey("freshness_ms")
         private val RATE_LIMIT = intPreferencesKey("rate_limit_per_minute")
         private val PRE_EXECUTION_DELAY_MS = longPreferencesKey("pre_execution_delay_ms")

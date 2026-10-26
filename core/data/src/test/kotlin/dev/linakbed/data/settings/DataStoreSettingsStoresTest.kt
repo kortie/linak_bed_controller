@@ -28,8 +28,10 @@ class DataStoreSettingsStoresTest {
     @Test
     fun `remote settings default to disabled with spec defaults`() =
         runTest {
-            assertThat(remote().settings().first()).isEqualTo(RemoteSettings())
-            assertThat(RemoteSettings().enabled).isFalse()
+            val stored = remote().settings().first()
+            assertThat(stored).isEqualTo(RemoteSettings())
+            assertThat(stored.enabled).isFalse()
+            assertThat(stored.appShortcutsEnabled).isTrue()
         }
 
     @Test
@@ -39,6 +41,7 @@ class DataStoreSettingsStoresTest {
             val changed =
                 RemoteSettings(
                     enabled = true,
+                    appShortcutsEnabled = false,
                     freshness = 90.seconds,
                     rateLimitPerMinute = 3,
                     preExecutionDelay = 20.seconds,
