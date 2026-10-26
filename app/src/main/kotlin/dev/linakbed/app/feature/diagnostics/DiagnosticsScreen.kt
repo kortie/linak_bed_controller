@@ -69,7 +69,6 @@ fun DiagnosticsContent(
             }
         }
         SystemCheck.entries.forEach { SystemCheckRow(it, state.checks[it], onFix) }
-        Text(stringResource(R.string.diag_smartthings_battery), style = MaterialTheme.typography.bodySmall)
         HorizontalDivider()
         Text(stringResource(R.string.diag_logs), style = MaterialTheme.typography.titleMedium)
         Text(

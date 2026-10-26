@@ -5,8 +5,6 @@ import kotlin.time.Duration.Companion.seconds
 
 /** 모든 원격 채널에 공통인 설정 (02 문서 A3·A4). */
 data class RemoteSettings(
-    /** SmartThings 알림 채널 스위치. 사용자가 켜야 한다 (알림 접근 권한 필요). */
-    val enabled: Boolean = false,
     /** 앱 바로가기 채널 스위치 (ADR-011). 사용자가 루틴을 직접 만들어야 동작하므로 기본 켬. */
     val appShortcutsEnabled: Boolean = true,
     /** S8: 보낸(없으면 받은) 시각이 이보다 오래되면 거절. */
@@ -20,7 +18,7 @@ data class RemoteSettings(
     /** 이 채널의 스위치가 켜져 있는가 (S8 첫 검사). */
     fun isEnabled(channel: RemoteChannel): Boolean =
         when (channel) {
-            RemoteChannel.SMARTTHINGS_NOTIFICATION -> enabled
+            RemoteChannel.SMARTTHINGS_NOTIFICATION -> false // S14에서 제거된 채널 (ADR-013)
             RemoteChannel.APP_SHORTCUT -> appShortcutsEnabled
         }
 

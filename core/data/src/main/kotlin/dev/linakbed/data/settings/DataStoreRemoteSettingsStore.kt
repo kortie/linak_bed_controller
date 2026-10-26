@@ -25,7 +25,6 @@ class DataStoreRemoteSettingsStore(
     override suspend fun update(transform: (RemoteSettings) -> RemoteSettings) {
         val next = transform(settings().first())
         dataStore.edit { prefs ->
-            prefs[ENABLED] = next.enabled
             prefs[APP_SHORTCUTS_ENABLED] = next.appShortcutsEnabled
             prefs[FRESHNESS_MS] = next.freshness.inWholeMilliseconds
             prefs[RATE_LIMIT] = next.rateLimitPerMinute
@@ -37,7 +36,6 @@ class DataStoreRemoteSettingsStore(
     private fun read(prefs: Preferences): RemoteSettings {
         val defaults = RemoteSettings()
         return RemoteSettings(
-            enabled = prefs[ENABLED] ?: defaults.enabled,
             appShortcutsEnabled = prefs[APP_SHORTCUTS_ENABLED] ?: defaults.appShortcutsEnabled,
             freshness = prefs[FRESHNESS_MS]?.milliseconds ?: defaults.freshness,
             rateLimitPerMinute = prefs[RATE_LIMIT] ?: defaults.rateLimitPerMinute,
@@ -48,7 +46,6 @@ class DataStoreRemoteSettingsStore(
 
     companion object {
         private const val FILE_NAME = "remote_settings"
-        private val ENABLED = booleanPreferencesKey("enabled")
         private val APP_SHORTCUTS_ENABLED = booleanPreferencesKey("app_shortcuts_enabled")
         private val FRESHNESS_MS = longPreferencesKey("freshness_ms")
         private val RATE_LIMIT = intPreferencesKey("rate_limit_per_minute")

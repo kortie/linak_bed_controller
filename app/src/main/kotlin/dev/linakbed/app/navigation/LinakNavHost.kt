@@ -21,8 +21,6 @@ import dev.linakbed.app.feature.about.AboutScreen
 import dev.linakbed.app.feature.diagnostics.DiagnosticsScreen
 import dev.linakbed.app.feature.home.HomeScreen
 import dev.linakbed.app.feature.log.ExecutionLogScreen
-import dev.linakbed.app.feature.remote.RemoteSettingsScreen
-import dev.linakbed.app.feature.remote.RoutineGuideScreen
 import dev.linakbed.app.feature.routines.RoutinesScreen
 import dev.linakbed.app.feature.settings.SettingsScreen
 
@@ -38,10 +36,6 @@ fun LinakNavHost(navController: NavHostController = rememberNavController()) {
         }
         page(Route.SETTINGS, R.string.nav_settings, navController) { SettingsScreen(onOpen = { navController.navigate(it.route) }) }
         page(Route.ABOUT, R.string.about_title, navController) { AboutScreen() }
-        page(SettingsRoute.REMOTE.route, SettingsRoute.REMOTE.title, navController) {
-            RemoteSettingsScreen(onOpenPairing = openPairing, onOpenGuide = { navController.navigate(SettingsRoute.GUIDE.route) })
-        }
-        page(SettingsRoute.GUIDE.route, SettingsRoute.GUIDE.title, navController) { RoutineGuideScreen() }
         page(SettingsRoute.ROUTINES.route, SettingsRoute.ROUTINES.title, navController) { RoutinesScreen(onOpenPairing = openPairing) }
         page(SettingsRoute.LOG.route, SettingsRoute.LOG.title, navController) { ExecutionLogScreen() }
         page(

@@ -16,6 +16,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class RoutinesViewModelTest {
@@ -32,7 +33,7 @@ class RoutinesViewModelTest {
     private fun viewModel() = RoutinesViewModel(store, SystemChecks { checks })
 
     @Test
-    fun `switch updates only the app shortcut channel`() =
+    fun `switch updates the app shortcut channel`() =
         runTest(dispatcher) {
             val vm = viewModel()
             runCurrent()
@@ -42,7 +43,6 @@ class RoutinesViewModelTest {
             runCurrent()
 
             assertThat(store.current.value.appShortcutsEnabled).isFalse()
-            assertThat(store.current.value.enabled).isFalse()
             assertThat(vm.uiState.value.settings.appShortcutsEnabled).isFalse()
         }
 
@@ -71,5 +71,32 @@ class RoutinesViewModelTest {
             vm.refresh()
             runCurrent()
             assertThat(vm.uiState.value.recommended).isEmpty()
+        }
+
+    @Test
+    fun `S14 the pre-execution delay and success notification are set here`() =
+        runTest(dispatcher) {
+            val vm = viewModel()
+            runCurrent()
+
+            vm.setDelay(30)
+            vm.setNotifyOnSuccess(true)
+            runCurrent()
+
+            assertThat(store.current.value.preExecutionDelay).isEqualTo(30.seconds)
+            assertThat(store.current.value.notifyOnSuccess).isTrue()
+        }
+
+    @Test
+    fun `S14 turning the delay off drops the full screen recommendation`() =
+        runTest(dispatcher) {
+            val vm = viewModel()
+            runCurrent()
+            assertThat(vm.uiState.value.recommended).contains(SystemCheck.FULL_SCREEN_INTENT)
+
+            vm.setDelay(0)
+            runCurrent()
+
+            assertThat(vm.uiState.value.recommended).doesNotContain(SystemCheck.FULL_SCREEN_INTENT)
         }
 }

@@ -52,7 +52,7 @@ class DiagnosticsViewModelTest {
         resetFileProviderCache()
         viewModel =
             DiagnosticsViewModel(
-                systemChecks = { mapOf(SystemCheck.PAIRED to true, SystemCheck.NOTIFICATION_ACCESS to false) },
+                systemChecks = { mapOf(SystemCheck.PAIRED to true, SystemCheck.POST_NOTIFICATIONS to false) },
                 exporter = LogExporter(app, logs, clock),
                 dispatcher = remoteDispatcher,
                 io = dispatcher,
@@ -67,7 +67,7 @@ class DiagnosticsViewModelTest {
         runTest(dispatcher) {
             runCurrent()
 
-            assertThat(viewModel.uiState.value.checks[SystemCheck.NOTIFICATION_ACCESS]).isFalse()
+            assertThat(viewModel.uiState.value.checks[SystemCheck.POST_NOTIFICATIONS]).isFalse()
             assertThat(viewModel.uiState.value.logDirectory).isEqualTo(logs.absolutePath)
         }
 

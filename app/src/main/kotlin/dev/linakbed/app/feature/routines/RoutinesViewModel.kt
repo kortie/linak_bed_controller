@@ -10,9 +10,11 @@ import dev.linakbed.domain.remote.RemoteSettings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 data class RoutinesUiState(
     val settings: RemoteSettings = RemoteSettings(),
@@ -40,11 +42,26 @@ class RoutinesViewModel
             viewModelScope.launch { store.update { it.copy(appShortcutsEnabled = enabled) } }
         }
 
+        /** S9 실행 전 대기 (0 = 끔). 바뀌면 전체 화면 알림이 필요한지도 달라지므로 다시 확인한다. */
+        fun setDelay(seconds: Int) {
+            viewModelScope.launch {
+                store.update { it.copy(preExecutionDelay = seconds.seconds) }
+                refresh()
+            }
+        }
+
+        fun setNotifyOnSuccess(enabled: Boolean) {
+            viewModelScope.launch { store.update { it.copy(notifyOnSuccess = enabled) } }
+        }
+
         fun refresh() {
             viewModelScope.launch {
                 val checks = systemChecks.evaluate()
                 val delayOn =
-                    uiState.value.settings.preExecutionDelay
+                    store
+                        .settings()
+                        .first()
+                        .preExecutionDelay
                         .isPositive()
                 val missing =
                     RECOMMENDED.filter { check ->

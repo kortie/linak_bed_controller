@@ -28,7 +28,7 @@ import java.time.Instant
 class RemoteResultNotifierTest {
     private val app = ApplicationProvider.getApplicationContext<Application>()
     private val manager = app.getSystemService(NotificationManager::class.java)
-    private val settings = FakeRemoteSettingsStore(RemoteSettings(enabled = true, notifyOnSuccess = false))
+    private val settings = FakeRemoteSettingsStore(RemoteSettings(notifyOnSuccess = false))
     private val notifier = RemoteResultNotifier(BedNotifications(app), settings)
     private val request =
         RemoteRequest("req-1", RemoteChannel.SMARTTHINGS_NOTIFICATION, RemoteCommand.Preset(PresetSlot.P2), Instant.EPOCH, null)

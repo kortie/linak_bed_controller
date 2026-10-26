@@ -19,11 +19,8 @@ fun SystemCheck.labelRes(): Int =
     when (this) {
         SystemCheck.BLUETOOTH_PERMISSION -> R.string.check_bluetooth
         SystemCheck.PAIRED -> R.string.check_paired
-        SystemCheck.NOTIFICATION_ACCESS -> R.string.check_notification_access
         SystemCheck.POST_NOTIFICATIONS -> R.string.check_post_notifications
-        SystemCheck.BATTERY_OPTIMIZATION -> R.string.check_battery
         SystemCheck.FULL_SCREEN_INTENT -> R.string.check_full_screen
-        SystemCheck.SMARTTHINGS_INSTALLED -> R.string.check_smartthings
     }
 
 /** 조건 하나: 이름 · 상태 · (모자라면) 해결 버튼. */

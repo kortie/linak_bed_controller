@@ -39,7 +39,7 @@
     <string name="preset_save_confirm">덮어쓰기</string>
     <string name="preset_rename_title">프리셋 이름 변경</string>
     <string name="preset_rename_confirm">변경</string>
-    <string name="preset_rename_routine_warning">SmartThings 루틴 문구에 이 이름을 쓰고 있다면, 이름을 바꾼 뒤 루틴 문구도 함께 바꿔야 합니다.</string>
+    <string name="preset_rename_routine_warning">이름을 바꿔도 침대에 저장된 위치는 그대로입니다.</string>
     <string name="preset_name_blank">이름을 입력하세요.</string>
     <string name="preset_name_too_long">%1$d자 이하로 입력하세요.</string>
     <string name="preset_name_line_break">줄바꿈은 쓸 수 없습니다.</string>
@@ -79,7 +79,7 @@
     <string name="channel_service">원격 명령 실행</string>
     <string name="channel_alerts">원격 명령 결과</string>
     <string name="channel_confirm">실행 전 확인</string>
-    <string name="service_running">SmartThings 명령을 실행하는 중</string>
+    <string name="service_running">루틴 명령을 실행하는 중</string>
     <string name="remote_result_executed">침대: %1$s 실행했습니다.</string>
     <string name="remote_result_failed">원격 명령 실패 (%1$s): %2$s</string>
     <string name="remote_channel_smartthings">SmartThings</string>
@@ -92,57 +92,21 @@
     <string name="confirm_seconds">%1$d초</string>
 
     <!-- S07: 설정 목록 -->
-    <string name="settings_remote">SmartThings 루틴 연동</string>
-    <string name="settings_guide">루틴 설정 방법</string>
     <string name="settings_log">실행 기록</string>
     <string name="settings_diagnostics">진단</string>
     <string name="common_back">뒤로</string>
-    <string name="common_continue">계속</string>
-    <string name="common_save">저장</string>
 
-    <!-- S07: SmartThings 연동 설정 -->
-    <string name="remote_enabled">원격 명령 받기</string>
-    <string name="remote_enabled_desc">SmartThings 루틴의 ‘알림 보내기’ 메시지로 침대를 움직입니다.</string>
-    <string name="remote_missing_title">먼저 아래 항목이 필요합니다</string>
     <string name="remote_fix">설정하기</string>
-    <string name="remote_prefix">명령 접두어</string>
-    <string name="remote_prefix_invalid">공백 없이 입력하세요.</string>
-    <string name="remote_pin">PIN (선택, 4~8자리 숫자)</string>
-    <string name="remote_pin_invalid">4~8자리 숫자로 입력하세요 (비우면 PIN 없음).</string>
     <string name="remote_delay">실행 전 대기 (취소 기회)</string>
     <string name="remote_delay_off">끔</string>
     <string name="remote_delay_seconds">%1$d초</string>
     <string name="remote_notify_success">성공해도 알림 보내기</string>
-    <string name="remote_dismiss_handled">처리한 SmartThings 알림 지우기</string>
-    <string name="access_dialog_title">알림 접근 허용</string>
-    <string name="access_dialog_message">SmartThings 앱의 알림에서만 침대 명령을 찾습니다. 다른 앱의 알림 내용은 읽거나 저장하지 않습니다.</string>
     <string name="check_bluetooth">블루투스 연결 권한</string>
     <string name="check_paired">침대 연결 (페어링)</string>
-    <string name="check_notification_access">알림 접근 허용</string>
     <string name="check_post_notifications">알림 표시 허용</string>
-    <string name="check_battery">이 앱 절전 예외</string>
     <string name="check_full_screen">전체 화면 알림 허용 (실행 전 취소 화면)</string>
-    <string name="check_smartthings">SmartThings 앱 설치</string>
-    <string name="tester_title">명령 문구 테스터</string>
-    <string name="tester_hint">예: #BED preset 2</string>
-    <string name="tester_run">해석해 보기</string>
-    <string name="tester_note">침대를 움직이지 않고 해석 결과만 보여 줍니다. 신선도·중복 검사는 건너뜁니다.</string>
-    <string name="tester_ignore">명령이 아닙니다 (무시됨)</string>
-    <string name="tester_rejected">거절: %1$s</string>
-    <string name="tester_request">실행될 명령: %1$s</string>
-    <string name="reject_auth_failed">PIN이 맞지 않습니다</string>
-    <string name="reject_invalid">명령 형식이 올바르지 않습니다</string>
-    <string name="reject_other">%1$s</string>
 
     <!-- S07: 루틴 설정 방법 (02 문서 Part B §5와 같게 유지) -->
-    <string name="guide_step1">1. SmartThings 앱 → 루틴 → + (루틴 추가)</string>
-    <string name="guide_step2">2. 조건: 예) 특정 시각 07:00, 월~금 / 또는 다른 기기 상태</string>
-    <string name="guide_step3">3. 실행: 알림 → 멤버에게 알림 보내기 → 메시지에 아래 문구 입력</string>
-    <string name="guide_step4">4. 저장한 뒤, 연동 설정의 ‘명령 문구 테스터’로 해석 결과를 확인</string>
-    <string name="guide_example">알림 메시지 예시</string>
-    <string name="guide_copy">복사</string>
-    <string name="guide_copied">복사했습니다</string>
-    <string name="guide_note">루틴을 SmartThings 앱에서 직접 실행하면 알림이 오지 않을 수 있습니다. 시험할 때는 몇 분 뒤 시각을 조건으로 만드세요.</string>
 
     <!-- S07: 실행 기록 -->
     <string name="log_empty">기록이 없습니다.</string>
@@ -152,8 +116,7 @@
     <!-- S07: 진단 -->
     <string name="diag_ok">정상</string>
     <string name="diag_needed">필요</string>
-    <string name="diag_fallback_warning">최근 백그라운드 서비스를 시작하지 못해 대체 경로로 실행했습니다 (%1$s). 이 앱과 SmartThings 앱을 절전 예외로 설정하세요.</string>
-    <string name="diag_smartthings_battery">SmartThings 앱도 ‘절전 예외 앱’에 추가하세요 (앱에서 확인할 수 없습니다).</string>
+    <string name="diag_fallback_warning">최근 백그라운드 서비스를 시작하지 못해 대체 경로로 실행했습니다 (%1$s). 문제가 계속되면 설정 → 배터리에서 이 앱을 ‘제한 없음’으로 바꿔 보세요.</string>
     <string name="diag_logs">로그</string>
     <string name="diag_log_dir">로그 위치: %1$s</string>
     <string name="diag_export">로그 내보내기</string>
@@ -171,7 +134,7 @@
 
     <string name="onboarding_step">%1$d / %2$d</string>
     <string name="onboarding_intro_title">침대를 휴대폰으로 조정하세요</string>
-    <string name="onboarding_intro_body">머리·발 높이 조정, 즐겨 쓰는 자세(프리셋) 저장과 이동, SmartThings 루틴으로 아침 기상 자세까지. 먼저 침대를 연결합니다.</string>
+    <string name="onboarding_intro_body">머리·발 높이 조정, 즐겨 쓰는 자세(프리셋) 저장과 이동, 삼성 모드 및 루틴으로 아침 기상 자세까지. 먼저 침대를 연결합니다.</string>
     <string name="onboarding_start">시작하기</string>
     <string name="onboarding_permission_denied">권한이 없으면 침대에 연결할 수 없습니다. 앱 설정의 ‘권한 → 근처 기기’에서 허용해 주세요.</string>
     <string name="onboarding_connect_title">침대 연결</string>
@@ -180,7 +143,6 @@
     <string name="pairing_not_found">침대가 목록에 보이지 않나요?</string>
     <string name="pairing_not_found_desc">일부 침대는 이름으로만 찾을 수 있습니다. 아래를 켜고 다시 ‘침대 찾기’를 누르세요.</string>
 
-    <string name="settings_remote_desc">루틴 알림으로 침대 움직이기</string>
     <string name="settings_log_desc">최근 침대 동작 기록</string>
     <string name="settings_diagnostics_desc">문제가 있을 때 상태 확인 · 개발자에게 보낼 로그</string>
 
@@ -189,7 +151,7 @@
     <string name="about_unofficial">LINAK® 또는 HANSAEM(한샘)의 공식 앱이 아닙니다. LINAK 컨트롤러를 쓰는 전동 침대와 호환되는 개인 개발 앱입니다.</string>
     <string name="about_developer">개발자</string>
     <string name="about_privacy">개인정보</string>
-    <string name="about_privacy_body">이 앱은 계정을 만들지 않고 어떤 데이터도 기기 밖으로 보내지 않습니다. SmartThings 알림은 이 기기 안에서만 읽고, 다른 앱의 알림 내용은 읽지 않습니다. 문제 해결용 로그는 기기에만 저장되며 직접 내보낼 때만 공유됩니다.</string>
+    <string name="about_privacy_body">이 앱은 계정을 만들지 않고 어떤 데이터도 기기 밖으로 보내지 않으며, 다른 앱의 알림을 읽지 않습니다. 문제 해결용 로그는 기기에만 저장되며 직접 내보낼 때만 공유됩니다.</string>
     <string name="about_privacy_policy">개인정보 처리방침 보기</string>
     <string name="about_licenses">오픈소스 라이선스</string>
     <string name="about_licenses_body">이 앱은 Android Jetpack(AndroidX, Compose, Room, DataStore, Navigation), Kotlin · kotlinx.coroutines, Dagger · Hilt를 사용합니다. 모두 Apache License 2.0을 따릅니다.</string>
@@ -230,7 +192,6 @@
     <string name="routines_step2">2. 조건: 시간, 알람 해제 등 원하는 조건</string>
     <string name="routines_step3">3. 실행: 앱 → 앱 열기 또는 앱 작업 실행 → 침대리모컨 → ‘프리셋 2 이동’ 또는 ‘침대 정지’</string>
     <string name="routines_step4">4. 프리셋 이동 전에는 큰 취소 화면이 뜹니다. 그대로 두면 침대가 움직입니다.</string>
-    <string name="routines_delay_note">실행 전 대기 시간은 ‘SmartThings 루틴 연동’ 화면의 설정(현재 %1$d초)을 함께 씁니다. 바로가기 이름은 ‘프리셋 N 이동’으로 고정되며, 앱에서 바꾼 프리셋 이름은 루틴 화면에 나오지 않습니다.</string>
     <string name="routines_launcher_note">홈 화면에서 앱 아이콘을 길게 눌러도 같은 바로가기가 보입니다.</string>
     <string name="routines_recommended">원활하게 동작하려면</string>
 
@@ -244,4 +205,5 @@
     <string name="pairing_max">침대는 %1$d대까지 연결할 수 있습니다.</string>
     <string name="home_add_bed_title">침대 추가</string>
     <string name="home_add_bed_body">두 번째 침대의 전원을 켜고 휴대폰을 가까이 두세요. 루틴의 프리셋·정지는 연결된 모든 침대가 함께 움직입니다.</string>
+    <string name="routines_name_note">바로가기 이름은 ‘프리셋 N 이동’·‘Custom 이동’으로 고정되며, 침대가 여러 대면 연결된 모든 침대가 함께 움직입니다.</string>
 </resources>

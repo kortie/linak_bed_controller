@@ -10,7 +10,6 @@ import dev.linakbed.data.log.RoomExecutionLog
 import dev.linakbed.data.pairing.DataStorePairingStore
 import dev.linakbed.data.preset.DataStorePresetNameStore
 import dev.linakbed.data.preset.DataStorePresetPoseStore
-import dev.linakbed.data.settings.DataStoreNotificationChannelSettingsStore
 import dev.linakbed.data.settings.DataStoreRemoteSettingsStore
 import dev.linakbed.domain.controller.BedActions
 import dev.linakbed.domain.controller.BedControllerConfig
@@ -22,7 +21,6 @@ import dev.linakbed.domain.controller.DefaultBedController
 import dev.linakbed.domain.log.BedLogger
 import dev.linakbed.domain.port.Clock
 import dev.linakbed.domain.port.ExecutionLog
-import dev.linakbed.domain.port.NotificationChannelSettingsStore
 import dev.linakbed.domain.port.PairingStore
 import dev.linakbed.domain.port.PresetNameStore
 import dev.linakbed.domain.port.PresetPoseStore
@@ -57,12 +55,6 @@ object DomainModule {
     fun provideRemoteSettingsStore(
         @ApplicationContext context: Context,
     ): RemoteSettingsStore = DataStoreRemoteSettingsStore.create(context)
-
-    @Provides
-    @Singleton
-    fun provideNotificationChannelSettingsStore(
-        @ApplicationContext context: Context,
-    ): NotificationChannelSettingsStore = DataStoreNotificationChannelSettingsStore.create(context)
 
     @Provides
     fun provideControllerEnvironment(

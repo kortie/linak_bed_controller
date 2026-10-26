@@ -22,6 +22,5 @@ include(
     ":core:domain",
     ":core:ble",
     ":core:data",
-    ":integration:smartthings",
     ":app",
 )

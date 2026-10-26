@@ -21,7 +21,7 @@ import dev.linakbed.app.R
 import dev.linakbed.app.feature.pairing.PairingSection
 import dev.linakbed.app.navigation.SettingsRoute
 
-/** 설정: 침대 관리 · SmartThings 루틴 연동 · 루틴 설정 방법 · 실행 기록 · 고급(진단). */
+/** 설정: 침대 관리 · 삼성 모드 및 루틴 · 실행 기록 · 고급(진단). */
 @Composable
 fun SettingsScreen(onOpen: (SettingsRoute) -> Unit) {
     val snackbar = remember { SnackbarHostState() }
@@ -47,9 +47,7 @@ fun SettingsScreen(onOpen: (SettingsRoute) -> Unit) {
 
 private fun descriptionOf(page: SettingsRoute): Int? =
     when (page) {
-        SettingsRoute.REMOTE -> R.string.settings_remote_desc
         SettingsRoute.ROUTINES -> R.string.settings_routines_desc
-        SettingsRoute.GUIDE -> null
         SettingsRoute.LOG -> R.string.settings_log_desc
         SettingsRoute.DIAGNOSTICS -> R.string.settings_diagnostics_desc
     }
