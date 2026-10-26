@@ -2,10 +2,13 @@ package dev.linakbed.app.feature.preset
 
 import dev.linakbed.domain.BedError
 import dev.linakbed.domain.preset.PresetName
+import dev.linakbed.domain.preset.PresetPose
 import dev.linakbed.protocol.PresetSlot
 
 data class PresetUiState(
     val names: Map<PresetSlot, String> = emptyMap(),
+    /** 프리셋별 마지막 자세 (S12, 버튼 그림). 모르는 슬롯은 없음. */
+    val poses: Map<PresetSlot, PresetPose> = emptyMap(),
     /** 지금 이동 중인 프리셋 (출처 무관). */
     val running: PresetSlot? = null,
     /** 저장 확인 대기 중인 슬롯 (S6). */

@@ -52,7 +52,6 @@
     <string name="pairing_filter_by_name">이름으로 찾기 (침대가 목록에 안 보일 때)</string>
     <string name="pairing_name_pattern">이름 패턴 (정규식)</string>
     <string name="pairing_pair">침대 연결하기</string>
-    <string name="pairing_pair_again">다른 침대로 다시 연결</string>
     <string name="pairing_unpair">연결 해제</string>
     <string name="pairing_unpair_confirm_title">연결을 해제할까요?</string>
     <string name="pairing_unpair_confirm_message">다시 쓰려면 침대를 다시 연결해야 합니다.</string>
@@ -163,12 +162,11 @@
     <string name="home_reconnect">다시 연결</string>
     <string name="home_open_settings">설정</string>
     <string name="home_open_about">정보</string>
-    <string name="home_preset_hint">프리셋을 길게 누르면 현재 위치 저장 · 이름 변경</string>
+    <string name="home_preset_hint">Custom을 길게 누르면 지금 자세를 Custom으로 저장합니다</string>
     <string name="home_preset_go">이 자세로 이동</string>
-    <string name="home_preset_edit">저장 · 이름 변경</string>
-    <string name="home_preset_save_here">현재 위치를 이 프리셋으로 저장</string>
+    <string name="home_preset_edit">지금 자세를 Custom으로 저장</string>
+    <string name="home_preset_save_here">현재 위치를 Custom으로 저장</string>
     <string name="home_preset_save_here_desc">저장하기 전에 한 번 더 확인합니다</string>
-    <string name="home_preset_rename">이름 변경</string>
     <string name="home_light">조명 · %1$s</string>
 
     <string name="onboarding_step">%1$d / %2$d</string>
@@ -215,11 +213,11 @@
     <string name="shortcut_preset_1">프리셋 1 이동</string>
     <string name="shortcut_preset_2">프리셋 2 이동</string>
     <string name="shortcut_preset_3">프리셋 3 이동</string>
-    <string name="shortcut_preset_4">프리셋 4 이동</string>
+    <string name="shortcut_preset_4">Custom 이동</string>
     <string name="shortcut_preset_1_long">침대를 프리셋 1 자세로 이동</string>
     <string name="shortcut_preset_2_long">침대를 프리셋 2 자세로 이동</string>
     <string name="shortcut_preset_3_long">침대를 프리셋 3 자세로 이동</string>
-    <string name="shortcut_preset_4_long">침대를 프리셋 4 자세로 이동</string>
+    <string name="shortcut_preset_4_long">침대를 Custom 자세로 이동</string>
     <string name="shortcut_stop">침대 정지</string>
     <string name="shortcut_stop_long">침대 움직임 정지</string>
     <string name="remote_channel_shortcut">모드 및 루틴·바로가기</string>
@@ -235,4 +233,15 @@
     <string name="routines_delay_note">실행 전 대기 시간은 ‘SmartThings 루틴 연동’ 화면의 설정(현재 %1$d초)을 함께 씁니다. 바로가기 이름은 ‘프리셋 N 이동’으로 고정되며, 앱에서 바꾼 프리셋 이름은 루틴 화면에 나오지 않습니다.</string>
     <string name="routines_launcher_note">홈 화면에서 앱 아이콘을 길게 눌러도 같은 바로가기가 보입니다.</string>
     <string name="routines_recommended">원활하게 동작하려면</string>
+
+    <!-- S12 프리셋 그림 · Custom -->
+    <string name="preset_custom">Custom</string>
+    <string name="preset_icon">프리셋 %1$d</string>
+    <string name="preset_icon_unknown">프리셋 %1$d, 자세 모름</string>
+
+    <!-- S13 침대 여러 대 -->
+    <string name="pairing_add">침대 추가</string>
+    <string name="pairing_max">침대는 %1$d대까지 연결할 수 있습니다.</string>
+    <string name="home_add_bed_title">침대 추가</string>
+    <string name="home_add_bed_body">두 번째 침대의 전원을 켜고 휴대폰을 가까이 두세요. 루틴의 프리셋·정지는 연결된 모든 침대가 함께 움직입니다.</string>
 </resources>

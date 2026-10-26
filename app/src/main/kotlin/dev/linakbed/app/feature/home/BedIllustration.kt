@@ -51,16 +51,47 @@ fun BedIllustration(
         } else {
             stringResource(R.string.home_bed_unknown)
         }
-    val alpha = if (pose.known) 1f else UNKNOWN_ALPHA
-    Canvas(
-        modifier
-            .aspectRatio(ASPECT)
-            .testTag(BED_TAG)
-            .semantics {
-                contentDescription = description
-                stateDescription = state
-            },
-    ) {
+    BedCanvas(
+        headAngle = headAngle,
+        feetAngle = feetAngle,
+        highlight = highlight,
+        known = pose.known,
+        modifier =
+            modifier
+                .testTag(BED_TAG)
+                .semantics {
+                    contentDescription = description
+                    stateDescription = state
+                },
+    )
+}
+
+/** 프리셋 버튼용 작은 침대 그림 (S12). 애니메이션·강조 없음, 설명은 버튼이 붙인다. */
+@Composable
+fun BedPoseIcon(
+    pose: BedPose,
+    modifier: Modifier = Modifier,
+) {
+    BedCanvas(
+        headAngle = (pose.head ?: 0f) * HEAD_MAX_DEG,
+        feetAngle = (pose.feet ?: 0f) * FEET_MAX_DEG,
+        highlight = null,
+        known = pose.known,
+        modifier = modifier,
+    )
+}
+
+/** 침대 옆모습을 주어진 각도로 그린다 (머리 왼쪽). */
+@Composable
+private fun BedCanvas(
+    headAngle: Float,
+    feetAngle: Float,
+    highlight: Actuator?,
+    known: Boolean,
+    modifier: Modifier,
+) {
+    val alpha = if (known) 1f else UNKNOWN_ALPHA
+    Canvas(modifier.aspectRatio(ASPECT)) {
         val g = Geometry(size)
         drawFrame(g, alpha)
         drawSegment(Offset(g.seatLeft + g.gap, g.top), g.seatLength - 2 * g.gap, g, lit = false, alpha)

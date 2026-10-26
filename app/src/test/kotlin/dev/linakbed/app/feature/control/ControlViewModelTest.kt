@@ -19,6 +19,7 @@ import dev.linakbed.protocol.LightAction
 import dev.linakbed.protocol.PresetSlot
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runCurrent
@@ -32,6 +33,7 @@ import org.junit.Test
 class ControlViewModelTest {
     private val dispatcher = StandardTestDispatcher()
     private val controller = FakeBedController()
+    private val allBeds = FakeBedController()
     private val pairing = FakePairingStore()
     private val presetNames = FakePresetNameStore()
     private lateinit var viewModel: ControlViewModel
@@ -41,7 +43,7 @@ class ControlViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(dispatcher)
-        viewModel = ControlViewModel(controller, pairing, presetNames)
+        viewModel = ControlViewModel(controller, pairing.observeAll().map { it.firstOrNull()?.name }, allBeds, presetNames)
     }
 
     @After
@@ -170,19 +172,20 @@ class ControlViewModelTest {
         }
 
     @Test
-    fun `stop and light go through the controller as MANUAL`() =
+    fun `ADR-012 STOP stops every bed, light goes to this bed, both as MANUAL`() =
         runTest(dispatcher) {
             act(ControlAction.Stop)
             act(ControlAction.Light(LightAction.TOGGLE))
             runCurrent()
 
-            assertThat(controller.calls).containsExactly("stop MANUAL", "light TOGGLE MANUAL").inOrder()
+            assertThat(allBeds.calls).containsExactly("stop MANUAL")
+            assertThat(controller.calls).containsExactly("light TOGGLE MANUAL")
         }
 
     @Test
     fun `failed stop is reported`() =
         runTest(dispatcher) {
-            controller.result = BedResult.Err(BedError.Disconnected)
+            allBeds.result = BedResult.Err(BedError.Disconnected)
 
             act(ControlAction.Stop)
             runCurrent()

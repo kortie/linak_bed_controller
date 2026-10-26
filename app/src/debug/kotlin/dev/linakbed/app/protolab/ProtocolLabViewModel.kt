@@ -12,7 +12,6 @@ import dev.linakbed.domain.log.LogRedaction
 import dev.linakbed.domain.model.PairedDevice
 import dev.linakbed.domain.port.Clock
 import dev.linakbed.domain.port.LinkState
-import dev.linakbed.domain.port.PairingStore
 import dev.linakbed.protocol.Actuator
 import dev.linakbed.protocol.BedCommand
 import dev.linakbed.protocol.Direction
@@ -31,6 +30,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 import javax.inject.Inject
+import javax.inject.Named
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -47,8 +47,8 @@ class ProtocolLabViewModel
         private val link: DiagnosticBedLink,
         private val scanner: DeviceScanner,
         private val clock: Clock,
-        private val controller: BedController,
-        private val pairingStore: PairingStore,
+        @param:Named(ProtocolLabModule.LAB) private val controller: BedController,
+        private val target: LabTarget,
     ) : ViewModel() {
         private val mutableState = MutableStateFlow(ProtocolLabUiState())
         val uiState: StateFlow<ProtocolLabUiState> = mutableState.asStateFlow()
@@ -120,17 +120,14 @@ class ProtocolLabViewModel
                 log("controller target: select a device first")
                 return
             }
-            viewModelScope.launch {
-                pairingStore.save(
-                    PairedDevice(
-                        bedId = UUID.randomUUID().toString(),
-                        address = device.address,
-                        name = device.name,
-                        cdmAssociationId = NO_CDM_ASSOCIATION,
-                    ),
+            target.device.value =
+                PairedDevice(
+                    bedId = UUID.randomUUID().toString(),
+                    address = device.address,
+                    name = device.name,
+                    cdmAssociationId = NO_CDM_ASSOCIATION,
                 )
-                log("controller target set to ${LogRedaction.mac(device.address)}")
-            }
+            log("controller target set to ${LogRedaction.mac(device.address)}")
         }
 
         /** 버튼을 누르고 있는 동안만 움직인다 (S3). 시작이 끝나기 전에 손을 떼도 바로 멈춘다. */

@@ -11,6 +11,7 @@ import dev.linakbed.domain.fake.FakeBedLogger
 import dev.linakbed.domain.fake.FakeClock
 import dev.linakbed.domain.fake.FakeExecutionLog
 import dev.linakbed.domain.fake.FakePairingStore
+import dev.linakbed.domain.preset.PresetPose
 import dev.linakbed.domain.safety.SafetyConfig
 import dev.linakbed.domain.safety.SafetyReason
 import dev.linakbed.protocol.Actuator
@@ -31,7 +32,7 @@ import kotlin.time.Duration.Companion.seconds
 /** 실제 컨트롤러·안전 감독이 가상 침대와 맞물려 도는지 (침대 없이 앱을 시험할 수 있다는 근거). */
 @OptIn(ExperimentalCoroutinesApi::class)
 class SimulatedBedControllerTest {
-    private val pairing = FakePairingStore(device = SimBedViewModel.DEVICE)
+    private val pairing = FakePairingStore(device = SimulatedBeds.device(1))
 
     private fun TestScope.setUp(): Pair<SimulatedBedLink, DefaultBedController> {
         val link = SimulatedBedLink(ProtocolProfile.DEFAULT, backgroundScope, FakeBedLogger())
@@ -39,7 +40,7 @@ class SimulatedBedControllerTest {
             DefaultBedController(
                 scope = backgroundScope,
                 link = link,
-                pairingStore = pairing,
+                bed = { pairing.device },
                 executionLog = FakeExecutionLog(),
                 config = BedControllerConfig(ProtocolProfile.DEFAULT, SafetyConfig()),
                 environment = ControllerEnvironment(FakeClock(), FakeBedLogger(), testTimeSource),
@@ -102,5 +103,17 @@ class SimulatedBedControllerTest {
             val result = controller.goToPreset(PresetSlot.P1, CommandSource.MANUAL)
 
             assertThat(result).isEqualTo(BedResult.Err(BedError.ConnectTimeout))
+        }
+
+    @Test
+    fun `S13 the virtual bed reports its configured preset positions`() =
+        runTest {
+            val (link, _) = setUp()
+
+            val poses = link.readPresetPoses()
+
+            assertThat(poses[PresetSlot.P1]).isEqualTo(PresetPose(0.0, 0.0))
+            assertThat(poses[PresetSlot.P2]).isEqualTo(PresetPose(30.0, 10.0))
+            assertThat(poses[PresetSlot.P3]).isEqualTo(PresetPose(60.0, 0.0))
         }
 }

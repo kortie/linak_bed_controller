@@ -1,33 +1,37 @@
 package dev.linakbed.app.simbed
 
+import android.content.Context
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dev.linakbed.app.di.ApplicationScope
-import dev.linakbed.ble.AndroidBedLink
+import dev.linakbed.app.di.BedLinkFactory
+import dev.linakbed.app.di.newAndroidBedLink
 import dev.linakbed.domain.log.BedLogger
-import dev.linakbed.domain.port.BedLink
-import dev.linakbed.protocol.ProtocolProfile
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Singleton
 
-/** 디버그: 페어링 주소에 따라 실제 링크와 가상 침대를 고른다 (릴리스는 `BedLinkModule`). */
+/** 디버그: 가상 침대 주소면 가상 링크, 아니면 실제 BLE (릴리스는 `BedLinkModule`). */
 @Module
 @InstallIn(SingletonComponent::class)
 object SimBedModule {
     @Provides
     @Singleton
-    fun provideSimulatedBedLink(
+    fun provideSimulatedBeds(
         @ApplicationScope scope: CoroutineScope,
         logger: BedLogger,
-    ): SimulatedBedLink = SimulatedBedLink(ProtocolProfile.DEFAULT, scope, logger)
+    ): SimulatedBeds = SimulatedBeds(scope, logger)
 
     @Provides
-    @Singleton
-    fun provideBedLink(
-        real: AndroidBedLink,
-        simulated: SimulatedBedLink,
+    fun provideBedLinkFactory(
+        @ApplicationContext context: Context,
+        simulated: SimulatedBeds,
+        logger: BedLogger,
         @ApplicationScope scope: CoroutineScope,
-    ): BedLink = SwitchingBedLink(real, simulated, scope)
+    ): BedLinkFactory =
+        BedLinkFactory { device ->
+            if (SimulatedBeds.isSimulated(device.address)) simulated.link(device.address) else newAndroidBedLink(context, logger, scope)
+        }
 }

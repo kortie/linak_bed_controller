@@ -9,24 +9,28 @@ import dagger.hilt.components.SingletonComponent
 import dev.linakbed.data.log.RoomExecutionLog
 import dev.linakbed.data.pairing.DataStorePairingStore
 import dev.linakbed.data.preset.DataStorePresetNameStore
+import dev.linakbed.data.preset.DataStorePresetPoseStore
 import dev.linakbed.data.settings.DataStoreNotificationChannelSettingsStore
 import dev.linakbed.data.settings.DataStoreRemoteSettingsStore
-import dev.linakbed.domain.controller.BedController
+import dev.linakbed.domain.controller.BedActions
 import dev.linakbed.domain.controller.BedControllerConfig
+import dev.linakbed.domain.controller.BedFleet
+import dev.linakbed.domain.controller.BedParts
+import dev.linakbed.domain.controller.BedPartsFactory
 import dev.linakbed.domain.controller.ControllerEnvironment
 import dev.linakbed.domain.controller.DefaultBedController
 import dev.linakbed.domain.log.BedLogger
-import dev.linakbed.domain.port.BedLink
 import dev.linakbed.domain.port.Clock
 import dev.linakbed.domain.port.ExecutionLog
 import dev.linakbed.domain.port.NotificationChannelSettingsStore
 import dev.linakbed.domain.port.PairingStore
 import dev.linakbed.domain.port.PresetNameStore
+import dev.linakbed.domain.port.PresetPoseStore
 import dev.linakbed.domain.port.RemoteSettingsStore
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Singleton
 
-/** 침대 제어의 유일한 진입점(BedController)과 그 저장소 포트. */
+/** 침대들(BedFleet)과 저장소 포트. */
 @Module
 @InstallIn(SingletonComponent::class)
 object DomainModule {
@@ -66,21 +70,37 @@ object DomainModule {
         logger: BedLogger,
     ): ControllerEnvironment = ControllerEnvironment(clock, logger)
 
+    /** 침대 한 대의 부품: 그 침대만의 링크와 컨트롤러(안전 감독·중재) (ADR-012). */
     @Provides
-    @Singleton
-    fun provideBedController(
+    fun provideBedPartsFactory(
         @ApplicationScope scope: CoroutineScope,
-        link: BedLink,
-        pairingStore: PairingStore,
+        links: BedLinkFactory,
         executionLog: ExecutionLog,
         environment: ControllerEnvironment,
-    ): BedController =
-        DefaultBedController(
-            scope = scope,
-            link = link,
-            pairingStore = pairingStore,
-            executionLog = executionLog,
-            config = BedControllerConfig(),
-            environment = environment,
-        )
+    ): BedPartsFactory =
+        BedPartsFactory { device, source ->
+            val link = links.create(device)
+            BedParts(link, DefaultBedController(scope, link, source, executionLog, BedControllerConfig(), environment))
+        }
+
+    /** 연결한 침대들: 침대마다 부품 + 프리셋 자세 기록 (ADR-012). */
+    @Provides
+    @Singleton
+    fun provideBedFleet(
+        @ApplicationScope scope: CoroutineScope,
+        pairingStore: PairingStore,
+        parts: BedPartsFactory,
+        presetPoses: PresetPoseStore,
+        environment: ControllerEnvironment,
+    ): BedFleet = BedFleet(scope, pairingStore, parts, presetPoses, environment.logger)
+
+    /** 원격 명령·전체 STOP: 모든 침대 (ADR-012). */
+    @Provides
+    fun provideAllBeds(fleet: BedFleet): BedActions = fleet.all
+
+    @Provides
+    @Singleton
+    fun providePresetPoseStore(
+        @ApplicationContext context: Context,
+    ): PresetPoseStore = DataStorePresetPoseStore.create(context)
 }

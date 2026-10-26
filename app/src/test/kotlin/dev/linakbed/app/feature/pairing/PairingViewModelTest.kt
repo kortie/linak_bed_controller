@@ -8,7 +8,6 @@ import com.google.common.truth.Truth.assertThat
 import dev.linakbed.app.pairing.AssociationEvent
 import dev.linakbed.app.pairing.IdGenerator
 import dev.linakbed.app.pairing.PairingFilter
-import dev.linakbed.domain.fake.FakeBedLink
 import dev.linakbed.domain.fake.FakePairingStore
 import dev.linakbed.domain.model.PairedDevice
 import kotlinx.coroutines.Dispatchers
@@ -30,11 +29,10 @@ class PairingViewModelTest {
     private val dispatcher = StandardTestDispatcher()
     private val pairing = FakeCompanionPairing()
     private val store = FakePairingStore(device = null)
-    private val link = FakeBedLink()
     private var nextId = 0
     private val ids = IdGenerator { "bed-${++nextId}" }
 
-    private fun viewModel() = PairingViewModel(pairing, store, link, ids)
+    private fun viewModel() = PairingViewModel(pairing, store, ids)
 
     @Before
     fun setUp() = Dispatchers.setMain(dispatcher)
@@ -50,7 +48,7 @@ class PairingViewModelTest {
             runCurrent()
 
             assertThat(vm.uiState.value.loaded).isTrue()
-            assertThat(vm.uiState.value.paired).isEqualTo(FakePairingStore.DEFAULT)
+            assertThat(vm.uiState.value.beds).containsExactly(FakePairingStore.DEFAULT)
         }
 
     @Test
@@ -85,7 +83,7 @@ class PairingViewModelTest {
 
             val expected = PairedDevice(bedId = "bed-1", address = "AA:BB:CC:DD:EE:FF", name = "DPG1M", cdmAssociationId = 5)
             assertThat(store.device).isEqualTo(expected)
-            assertThat(vm.uiState.value.paired).isEqualTo(expected)
+            assertThat(vm.uiState.value.beds).containsExactly(expected)
             assertThat(vm.uiState.value.inProgress).isFalse()
             assertThat(vm.uiState.value.message).isEqualTo(PairingMessage.Paired("DPG1M"))
             assertThat(pairing.requestedFilters).containsExactly(PairingFilter.ControlServiceUuid)
@@ -106,11 +104,11 @@ class PairingViewModelTest {
             assertThat(store.device?.bedId).isEqualTo("bed-original")
             assertThat(store.device?.cdmAssociationId).isEqualTo(9)
             assertThat(pairing.disassociated).isEmpty()
-            assertThat(link.disconnects).isEqualTo(0)
+            assertThat(store.beds.value).hasSize(1)
         }
 
     @Test
-    fun `pairing a different bed releases the old association and connection`() =
+    fun `S13 pairing a different bed adds it as a second bed`() =
         runTest(dispatcher) {
             store.device = PairedDevice("bed-original", "AA:BB:CC:DD:EE:FF", "old", 1)
             val vm = viewModel()
@@ -121,9 +119,23 @@ class PairingViewModelTest {
             pairing.events.emit(AssociationEvent.Created(associationId = 2, address = "11:22:33:44:55:66", name = null))
             runCurrent()
 
-            assertThat(store.device?.bedId).isEqualTo("bed-1")
-            assertThat(pairing.disassociated).containsExactly(1)
-            assertThat(link.disconnects).isEqualTo(1)
+            assertThat(store.beds.value.map { it.bedId }).containsExactly("bed-original", "bed-1").inOrder()
+            assertThat(pairing.disassociated).isEmpty()
+            assertThat(vm.uiState.value.canAdd).isFalse()
+        }
+
+    @Test
+    fun `S13 with two beds, adding a third is refused before the system dialog`() =
+        runTest(dispatcher) {
+            store.beds.value = listOf(FakePairingStore.DEFAULT, FakePairingStore.SECOND)
+            val vm = viewModel()
+            runCurrent()
+
+            vm.onAction(PairingAction.Pair)
+            runCurrent()
+
+            assertThat(vm.uiState.value.message).isEqualTo(PairingMessage.Full)
+            assertThat(pairing.requestedFilters).isEmpty()
         }
 
     @Test
@@ -173,19 +185,18 @@ class PairingViewModelTest {
         }
 
     @Test
-    fun `unpair removes the association, the saved device and the connection`() =
+    fun `unpair removes only that bed and its association`() =
         runTest(dispatcher) {
-            store.device = PairedDevice("bed-1", "AA:BB:CC:DD:EE:FF", null, 4)
+            store.beds.value = listOf(PairedDevice("bed-1", "AA:BB:CC:DD:EE:FF", null, 4), FakePairingStore.SECOND)
             val vm = viewModel()
             runCurrent()
 
-            vm.onAction(PairingAction.Unpair)
+            vm.onAction(PairingAction.Unpair("bed-1"))
             runCurrent()
 
             assertThat(pairing.disassociated).containsExactly(4)
-            assertThat(store.device).isNull()
-            assertThat(link.disconnects).isEqualTo(1)
-            assertThat(vm.uiState.value.paired).isNull()
+            assertThat(store.beds.value).containsExactly(FakePairingStore.SECOND)
+            assertThat(vm.uiState.value.beds).containsExactly(FakePairingStore.SECOND)
             assertThat(vm.uiState.value.message).isEqualTo(PairingMessage.Unpaired)
         }
 }

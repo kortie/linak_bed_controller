@@ -14,7 +14,7 @@ import dev.linakbed.app.service.ResultNotifier
 import dev.linakbed.app.service.ServiceRemoteRequestDispatcher
 import dev.linakbed.app.service.ServiceStarter
 import dev.linakbed.app.service.ServiceTask
-import dev.linakbed.domain.controller.BedController
+import dev.linakbed.domain.controller.BedActions
 import dev.linakbed.domain.controller.ControllerEnvironment
 import dev.linakbed.domain.log.BedLogger
 import dev.linakbed.domain.port.Clock
@@ -57,7 +57,7 @@ object RemoteModule {
     @Provides
     @Singleton
     fun provideRemoteCommandHandler(
-        controller: BedController,
+        controller: BedActions,
         executionLog: ExecutionLog,
         settings: RemoteSettingsStore,
         confirmation: MotionConfirmation,

@@ -23,7 +23,7 @@ import javax.inject.Inject
 
 enum class RootState { LOADING, ONBOARDING, READY }
 
-/** 페어링 여부로 연결 안내와 홈 중 무엇을 보일지 정한다 (ADR-009). */
+/** 연결한 침대가 하나라도 있는지로 연결 안내와 홈 중 무엇을 보일지 정한다 (ADR-009·012). */
 @HiltViewModel
 class RootViewModel
     @Inject
@@ -32,8 +32,8 @@ class RootViewModel
     ) : ViewModel() {
         val state: StateFlow<RootState> =
             pairingStore
-                .observe()
-                .map { if (it == null) RootState.ONBOARDING else RootState.READY }
+                .observeAll()
+                .map { if (it.isEmpty()) RootState.ONBOARDING else RootState.READY }
                 .stateIn(viewModelScope, SharingStarted.Eagerly, RootState.LOADING)
     }
 

@@ -26,6 +26,7 @@ import dev.linakbed.app.feature.preset.PresetAction
 import dev.linakbed.app.feature.preset.PresetUiState
 import dev.linakbed.app.ui.theme.LinakBedTheme
 import dev.linakbed.domain.port.LinkState
+import dev.linakbed.domain.preset.PresetPose
 import dev.linakbed.protocol.Actuator
 import dev.linakbed.protocol.Direction
 import dev.linakbed.protocol.LightAction
@@ -121,7 +122,7 @@ class HomeScreenTest {
             down(center)
             up()
         }
-        compose.onNodeWithText("프리셋 1").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("프리셋 1, 자세 모름").performScrollTo().performClick()
         compose.onNodeWithText("조명 · 알 수 없음").performScrollTo().assertIsNotEnabled()
         compose.onNodeWithContentDescription("침대 정지").assertIsEnabled().performClick()
 
@@ -149,9 +150,9 @@ class HomeScreenTest {
 
     @Test
     fun `tapping a preset recalls it, light toggles`() {
-        show(presets = PresetUiState(names = mapOf(PresetSlot.P2 to "기상")))
+        show(presets = PresetUiState(poses = mapOf(PresetSlot.P2 to PresetPose(30.0, 10.0))))
 
-        compose.onNodeWithText("기상").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("프리셋 2").performScrollTo().performClick()
         compose.onNodeWithText("조명 · 알 수 없음").performScrollTo().performClick()
 
         assertThat(presetActions).containsExactly(PresetAction.Recall(PresetSlot.P2))
@@ -159,30 +160,45 @@ class HomeScreenTest {
     }
 
     @Test
-    fun `S6 long-press opens the edit sheet and save only requests confirmation`() {
-        show()
+    fun `S12 presets 1 to 3 are pictures, preset 4 is Custom, names are not shown`() {
+        show(presets = PresetUiState(names = mapOf(PresetSlot.P1 to "기상"), poses = mapOf(PresetSlot.P1 to PresetPose(20.0, 0.0))))
 
-        compose.onNodeWithText("프리셋 3").performScrollTo().performTouchInput { longClick() }
-        compose.onNodeWithText("현재 위치를 이 프리셋으로 저장").performClick()
-
-        assertThat(presetActions).containsExactly(PresetAction.RequestSave(PresetSlot.P3))
+        compose.onNodeWithContentDescription("프리셋 1").assertExists()
+        compose.onNodeWithContentDescription("프리셋 2, 자세 모름").assertExists()
+        compose.onNodeWithContentDescription("프리셋 3, 자세 모름").assertExists()
+        compose.onNodeWithText("Custom").assertExists()
+        compose.onNodeWithText("기상").assertDoesNotExist()
+        compose.onNodeWithText("프리셋 4").assertDoesNotExist()
     }
 
     @Test
-    fun `S6 a pending save shows the confirmation dialog`() {
-        show(presets = PresetUiState(pendingSave = PresetSlot.P1))
+    fun `S12 S6 long-pressing Custom offers save, which only requests confirmation`() {
+        show()
+
+        compose.onNodeWithText("Custom").performScrollTo().performTouchInput { longClick() }
+        compose.onNodeWithText("현재 위치를 Custom으로 저장").performClick()
+
+        assertThat(presetActions).containsExactly(PresetAction.RequestSave(PresetSlot.P4))
+    }
+
+    @Test
+    fun `S12 presets 1 to 3 cannot be saved from the app`() {
+        show()
+
+        compose.onNodeWithContentDescription("프리셋 3, 자세 모름").performScrollTo().performTouchInput { longClick() }
+        compose.waitForIdle()
+
+        // 길게 눌러도 일반 탭처럼 그 프리셋으로 이동할 뿐, 저장 메뉴는 없다.
+        compose.onNodeWithText("현재 위치를 Custom으로 저장").assertDoesNotExist()
+        assertThat(presetActions.filterIsInstance<PresetAction.RequestSave>()).isEmpty()
+    }
+
+    @Test
+    fun `S6 a pending save shows the confirmation dialog naming Custom`() {
+        show(presets = PresetUiState(pendingSave = PresetSlot.P4))
 
         compose.onNodeWithText("덮어쓰기").assertIsNotEnabled()
-    }
-
-    @Test
-    fun `edit sheet rename starts renaming`() {
-        show()
-
-        compose.onNodeWithText("프리셋 4").performScrollTo().performTouchInput { longClick() }
-        compose.onNodeWithText("이름 변경").performClick()
-
-        assertThat(presetActions).containsExactly(PresetAction.StartRename(PresetSlot.P4))
+        compose.onNodeWithText("현재 침대 위치로 ‘Custom’을(를) 덮어씁니다. 이전 위치는 되돌릴 수 없습니다.").assertExists()
     }
 
     @Test

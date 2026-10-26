@@ -64,11 +64,17 @@ private fun RenameDialog(
     )
 }
 
+/** 화면에 보이는 프리셋 이름. 4번은 항상 "Custom" (S12). */
 @Composable
 fun presetLabel(
     state: PresetUiState,
     slot: PresetSlot,
-): String = state.names[slot] ?: stringResource(R.string.preset_fallback_name, slot.number)
+): String =
+    if (slot == PresetSlot.P4) {
+        stringResource(R.string.preset_custom)
+    } else {
+        state.names[slot] ?: stringResource(R.string.preset_fallback_name, slot.number)
+    }
 
 @Composable
 private fun renameErrorText(
@@ -89,7 +95,9 @@ fun presetMessage(
     message: PresetMessage,
     names: Map<PresetSlot, String>,
 ): String {
-    fun label(slot: PresetSlot) = names[slot] ?: slot.name
+    val custom = stringResource(R.string.preset_custom)
+
+    fun label(slot: PresetSlot) = if (slot == PresetSlot.P4) custom else names[slot] ?: slot.name
     return when (message) {
         is PresetMessage.Arrived -> stringResource(R.string.preset_arrived, label(message.slot))
         is PresetMessage.Saved -> stringResource(R.string.preset_saved, label(message.slot))
