@@ -91,7 +91,7 @@ private fun DiagnosticsPreview() {
         DiagnosticsContent(
             DiagnosticsUiState(
                 checks = mapOf(SystemCheck.PAIRED to true),
-                logDirectory = "Android/data/com.juanstudio.linakbed/files/logs",
+                logDirectory = "Android/data/com.juanstudio.bedcontrol/files/logs",
             ),
             onFix = {},
             onExport = {},
