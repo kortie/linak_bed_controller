@@ -47,7 +47,7 @@ class DefaultBedControllerTest {
         DefaultBedController(
             scope = backgroundScope,
             link = link,
-            pairingStore = pairing,
+            bed = { pairing.device },
             executionLog = log,
             config = BedControllerConfig(profile, SafetyConfig()),
             environment = ControllerEnvironment(FakeClock(), logger, testTimeSource),

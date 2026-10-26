@@ -9,7 +9,7 @@ import dev.linakbed.domain.log.warn
 import dev.linakbed.domain.port.BedLink
 import dev.linakbed.domain.port.ExecutionLog
 import dev.linakbed.domain.port.LinkState
-import dev.linakbed.domain.port.PairingStore
+import dev.linakbed.domain.port.PairedBedSource
 import dev.linakbed.domain.safety.SafetySupervisor
 import dev.linakbed.domain.safety.SensorBaseline
 import dev.linakbed.protocol.Actuator
@@ -50,7 +50,7 @@ import kotlin.time.Duration
 class DefaultBedController(
     private val scope: CoroutineScope,
     private val link: BedLink,
-    private val pairingStore: PairingStore,
+    private val bed: PairedBedSource,
     private val executionLog: ExecutionLog,
     config: BedControllerConfig,
     environment: ControllerEnvironment,
@@ -272,7 +272,7 @@ class DefaultBedController(
     /** 동작 전 연결 보장. 연결 실패는 동작 시작 전이므로 1회 재시도한다 (S5: 동작 중 끊김은 재시도하지 않음). */
     private suspend fun ensureConnected(): BedResult<Unit> {
         if (link.state.value == LinkState.Connected) return BedResult.Ok(Unit)
-        val device = pairingStore.pairedDevice()
+        val device = bed.current()
         return if (device == null) BedResult.Err(BedError.NotPaired) else connectWithRetry(device.address)
     }
 

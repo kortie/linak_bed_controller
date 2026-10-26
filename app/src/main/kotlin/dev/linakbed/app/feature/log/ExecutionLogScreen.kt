@@ -69,6 +69,7 @@ private fun source(entry: ExecutionEntry): String =
         CommandSource.REMOTE ->
             when (entry.channel) {
                 RemoteChannel.SMARTTHINGS_NOTIFICATION, null -> stringResource(R.string.remote_channel_smartthings)
+                RemoteChannel.APP_SHORTCUT -> stringResource(R.string.remote_channel_shortcut)
             }
     }
 

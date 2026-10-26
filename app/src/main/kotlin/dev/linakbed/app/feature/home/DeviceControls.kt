@@ -118,5 +118,5 @@ private fun LightButton(
     }
 }
 
-private const val BUTTON_SIZE = 64
+private const val BUTTON_SIZE = 48
 private const val LABEL_WIDTH = 48

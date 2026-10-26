@@ -63,9 +63,9 @@ fun OnboardingScreen(
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
             viewModel.onAction(OnboardingAction.PermissionResult(it))
         }
-    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-        if (state.step != OnboardingStep.INTRO) viewModel.onAction(OnboardingAction.PermissionChecked(context.hasBluetoothPermission()))
-    }
+    LifecycleEventEffect(
+        Lifecycle.Event.ON_RESUME,
+    ) { viewModel.onAction(OnboardingAction.PermissionChecked(context.hasBluetoothPermission())) }
     BackHandler(enabled = state.step != OnboardingStep.INTRO) { viewModel.onAction(OnboardingAction.Back) }
     PairingEffects(pairingState, pairing::onAction, snackbar)
     Scaffold(snackbarHost = { SnackbarHost(snackbar) }) { padding ->
@@ -96,7 +96,7 @@ fun OnboardingContent(
         verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(stepLabel(state.step), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+        Text(stepLabel(state), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
         when (state.step) {
             OnboardingStep.INTRO -> Intro(onStart)
             OnboardingStep.PERMISSION -> Permission(state.permissionDenied, onRequestPermission, onOpenAppSettings)
@@ -165,8 +165,8 @@ private fun PrimaryButton(
 }
 
 @Composable
-private fun stepLabel(step: OnboardingStep): String =
-    stringResource(R.string.onboarding_step, step.ordinal + 1, OnboardingStep.entries.size)
+private fun stepLabel(state: OnboardingUiState): String =
+    stringResource(R.string.onboarding_step, state.stepNumber, state.visibleSteps.size)
 
 private fun Context.hasBluetoothPermission() =
     checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED

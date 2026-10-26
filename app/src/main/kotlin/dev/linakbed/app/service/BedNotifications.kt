@@ -141,6 +141,7 @@ class BedNotifications(
     private fun channelName(channel: RemoteChannel): String =
         when (channel) {
             RemoteChannel.SMARTTHINGS_NOTIFICATION -> context.getString(R.string.remote_channel_smartthings)
+            RemoteChannel.APP_SHORTCUT -> context.getString(R.string.remote_channel_shortcut)
         }
 
     private fun describe(command: RemoteCommand): String =

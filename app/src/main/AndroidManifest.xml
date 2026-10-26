@@ -37,6 +37,10 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!-- 앱 바로가기: 삼성 모드 및 루틴 "앱 작업" · 런처 길게 누르기 (ADR-011) -->
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
         </activity>
 
         <!-- 실행 전 큰 취소 화면 (S9, ADR-008): 잠금 화면 위에 뜬다. 최근 앱 목록에 남기지 않는다. -->
@@ -46,6 +50,15 @@
             android:exported="false"
             android:launchMode="singleTask"
             android:taskAffinity="${applicationId}.confirm" />
+
+        <!-- 앱 바로가기 중계 (ADR-011): 화면 없이 원격 요청으로 넘기고 닫힌다. 다른 앱은 시작할 수 없다 -->
+        <activity
+            android:name=".shortcut.ShortcutActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
         <receiver
             android:name=".feature.confirm.CancelMotionReceiver"

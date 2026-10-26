@@ -7,7 +7,6 @@ import dev.linakbed.domain.BedResult
 import dev.linakbed.domain.controller.BedStatus
 import dev.linakbed.domain.fake.FakeBedController
 import dev.linakbed.domain.fake.FakeClock
-import dev.linakbed.domain.fake.FakePairingStore
 import dev.linakbed.domain.port.LinkState
 import dev.linakbed.protocol.Actuator
 import dev.linakbed.protocol.BedCommand
@@ -37,7 +36,7 @@ class ProtocolLabViewModelTest {
     private val scanResults = MutableSharedFlow<ScannedDevice>(extraBufferCapacity = 8)
     private val scanner = DeviceScanner { scanResults as Flow<ScannedDevice> }
     private val controller = FakeBedController()
-    private val pairing = FakePairingStore(device = null)
+    private val target = LabTarget()
     private lateinit var viewModel: ProtocolLabViewModel
 
     private val headUp = BedCommand.Move(Actuator.HEAD, Direction.UP)
@@ -45,7 +44,7 @@ class ProtocolLabViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(dispatcher)
-        viewModel = ProtocolLabViewModel(link, scanner, FakeClock(), controller, pairing)
+        viewModel = ProtocolLabViewModel(link, scanner, FakeClock(), controller, target)
     }
 
     @After
@@ -272,7 +271,7 @@ class ProtocolLabViewModelTest {
         runTest(dispatcher) {
             act(ProtocolLabAction.UseSelectedAsControllerTarget)
             runCurrent()
-            assertThat(pairing.device).isNull()
+            assertThat(target.device.value).isNull()
 
             act(ProtocolLabAction.StartScan)
             runCurrent()
@@ -282,8 +281,8 @@ class ProtocolLabViewModelTest {
             act(ProtocolLabAction.UseSelectedAsControllerTarget)
             runCurrent()
 
-            assertThat(pairing.device?.address).isEqualTo("22:22:22:22:22:22")
-            assertThat(pairing.device?.cdmAssociationId).isEqualTo(ProtocolLabViewModel.NO_CDM_ASSOCIATION)
+            assertThat(target.device.value?.address).isEqualTo("22:22:22:22:22:22")
+            assertThat(target.device.value?.cdmAssociationId).isEqualTo(ProtocolLabViewModel.NO_CDM_ASSOCIATION)
             act(ProtocolLabAction.StopScan)
             runCurrent()
         }

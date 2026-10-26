@@ -46,7 +46,7 @@ class AndroidSystemChecks(
         val power = context.getSystemService(PowerManager::class.java)
         return mapOf(
             SystemCheck.BLUETOOTH_PERMISSION to granted(Manifest.permission.BLUETOOTH_CONNECT),
-            SystemCheck.PAIRED to (pairingStore.pairedDevice() != null),
+            SystemCheck.PAIRED to pairingStore.all().isNotEmpty(),
             SystemCheck.NOTIFICATION_ACCESS to notifications.isNotificationListenerAccessGranted(listener()),
             SystemCheck.POST_NOTIFICATIONS to granted(Manifest.permission.POST_NOTIFICATIONS),
             SystemCheck.BATTERY_OPTIMIZATION to power.isIgnoringBatteryOptimizations(context.packageName),

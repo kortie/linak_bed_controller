@@ -48,6 +48,7 @@ fun SettingsScreen(onOpen: (SettingsRoute) -> Unit) {
 private fun descriptionOf(page: SettingsRoute): Int? =
     when (page) {
         SettingsRoute.REMOTE -> R.string.settings_remote_desc
+        SettingsRoute.ROUTINES -> R.string.settings_routines_desc
         SettingsRoute.GUIDE -> null
         SettingsRoute.LOG -> R.string.settings_log_desc
         SettingsRoute.DIAGNOSTICS -> R.string.settings_diagnostics_desc

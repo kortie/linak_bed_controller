@@ -35,6 +35,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.linakbed.app.R
 import dev.linakbed.app.ui.theme.LinakBedTheme
 import dev.linakbed.domain.model.PairedDevice
+import dev.linakbed.domain.port.PairingStore
 
 /** 시스템 기기 선택 창 띄우기와 결과 메시지 (연결 안내·설정 화면 공용). */
 @Composable
@@ -79,33 +80,53 @@ fun PairingContent(
     onAction: (PairingAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var confirmUnpair by remember { mutableStateOf(false) }
+    var confirmUnpair by remember { mutableStateOf<PairedDevice?>(null) }
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(stringResource(R.string.pairing_title), style = MaterialTheme.typography.titleLarge)
-        PairedDeviceCard(state.paired, state.loaded)
-        Button(onClick = { onAction(PairingAction.Pair) }, enabled = !state.inProgress, modifier = Modifier.fillMaxWidth()) {
-            Text(stringResource(if (state.paired == null) R.string.pairing_pair else R.string.pairing_pair_again))
+        when {
+            !state.loaded -> Text(stringResource(R.string.common_loading))
+            state.beds.isEmpty() -> Text(stringResource(R.string.pairing_none))
+            else -> state.beds.forEach { bed -> BedRow(bed, onUnpair = { confirmUnpair = bed }) }
         }
-        if (state.paired != null) {
-            OutlinedButton(onClick = { confirmUnpair = true }, modifier = Modifier.fillMaxWidth()) {
-                Text(stringResource(R.string.pairing_unpair))
+        if (state.canAdd) {
+            Button(onClick = { onAction(PairingAction.Pair) }, enabled = !state.inProgress, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(if (state.beds.isEmpty()) R.string.pairing_pair else R.string.pairing_add))
             }
+        } else {
+            Text(stringResource(R.string.pairing_max, PairingStore.MAX_BEDS), style = MaterialTheme.typography.bodySmall)
         }
         NotFoundHelp(state, onAction)
     }
-    if (confirmUnpair) {
+    confirmUnpair?.let { bed ->
         AlertDialog(
-            onDismissRequest = { confirmUnpair = false },
+            onDismissRequest = { confirmUnpair = null },
             title = { Text(stringResource(R.string.pairing_unpair_confirm_title)) },
             text = { Text(stringResource(R.string.pairing_unpair_confirm_message)) },
             confirmButton = {
                 TextButton(onClick = {
-                    confirmUnpair = false
-                    onAction(PairingAction.Unpair)
+                    confirmUnpair = null
+                    onAction(PairingAction.Unpair(bed.bedId))
                 }) { Text(stringResource(R.string.pairing_unpair)) }
             },
-            dismissButton = { TextButton(onClick = { confirmUnpair = false }) { Text(stringResource(R.string.common_cancel)) } },
+            dismissButton = { TextButton(onClick = { confirmUnpair = null }) { Text(stringResource(R.string.common_cancel)) } },
         )
+    }
+}
+
+@Composable
+private fun BedRow(
+    bed: PairedDevice,
+    onUnpair: () -> Unit,
+) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                bed.name ?: stringResource(R.string.pairing_unnamed),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.weight(1f),
+            )
+            OutlinedButton(onClick = onUnpair) { Text(stringResource(R.string.pairing_unpair)) }
+        }
     }
 }
 
@@ -135,22 +156,6 @@ fun NotFoundHelp(
 }
 
 @Composable
-private fun PairedDeviceCard(
-    device: PairedDevice?,
-    loaded: Boolean,
-) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            when {
-                !loaded -> Text(stringResource(R.string.common_loading))
-                device == null -> Text(stringResource(R.string.pairing_none))
-                else -> Text(device.name ?: stringResource(R.string.pairing_unnamed), style = MaterialTheme.typography.titleMedium)
-            }
-        }
-    }
-}
-
-@Composable
 private fun pairingMessage(message: PairingMessage): String =
     when (message) {
         is PairingMessage.Paired -> stringResource(R.string.pairing_done, message.name ?: stringResource(R.string.pairing_unnamed))
@@ -158,6 +163,7 @@ private fun pairingMessage(message: PairingMessage): String =
         is PairingMessage.Failed -> stringResource(R.string.pairing_failed, message.reason ?: "-")
         PairingMessage.InvalidPattern -> stringResource(R.string.pairing_invalid_pattern)
         PairingMessage.Unpaired -> stringResource(R.string.pairing_unpaired)
+        PairingMessage.Full -> stringResource(R.string.pairing_max, PairingStore.MAX_BEDS)
     }
 
 @Preview(showBackground = true)
@@ -165,7 +171,7 @@ private fun pairingMessage(message: PairingMessage): String =
 private fun PairingContentPreview() {
     LinakBedTheme {
         PairingContent(
-            state = PairingUiState(loaded = true, paired = PairedDevice("bed-1", "AA:BB:CC:DD:EE:FF", "DPG1M", 3)),
+            state = PairingUiState(loaded = true, beds = listOf(PairedDevice("bed-1", "AA:BB:CC:DD:EE:FF", "DPG1M", 3))),
             onAction = {},
         )
     }

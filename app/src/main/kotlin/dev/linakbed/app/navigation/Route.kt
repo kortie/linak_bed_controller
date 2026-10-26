@@ -16,6 +16,7 @@ enum class SettingsRoute(
     @param:StringRes val title: Int,
 ) {
     REMOTE("settings/remote", R.string.settings_remote),
+    ROUTINES("settings/routines", R.string.settings_routines),
     GUIDE("settings/guide", R.string.settings_guide),
     LOG("settings/log", R.string.settings_log),
     DIAGNOSTICS("settings/diagnostics", R.string.settings_diagnostics),

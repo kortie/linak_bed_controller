@@ -21,7 +21,8 @@ class RemoteCommandPolicyTest {
         receivedAt: Instant = clock.now(),
         sentAt: Instant? = null,
         command: RemoteCommand = RemoteCommand.Preset(PresetSlot.P1),
-    ) = RemoteRequest(id, RemoteChannel.SMARTTHINGS_NOTIFICATION, command, receivedAt, sentAt)
+        channel: RemoteChannel = RemoteChannel.SMARTTHINGS_NOTIFICATION,
+    ) = RemoteRequest(id, channel, command, receivedAt, sentAt)
 
     private fun Instant.minus(seconds: Long): Instant = minus(seconds.seconds.toJavaDuration())
 
@@ -35,6 +36,34 @@ class RemoteCommandPolicyTest {
         settings = settings.copy(enabled = false)
 
         assertThat(policy.evaluate(request(receivedAt = clock.now().minus(600)))).isEqualTo(PolicyDecision.Reject(RejectReason.DISABLED))
+    }
+
+    @Test
+    fun `S8 each channel has its own switch`() {
+        settings = RemoteSettings(enabled = false, appShortcutsEnabled = true)
+        assertThat(policy.evaluate(request(channel = RemoteChannel.APP_SHORTCUT))).isEqualTo(PolicyDecision.Accept)
+        assertThat(policy.evaluate(request())).isEqualTo(PolicyDecision.Reject(RejectReason.DISABLED))
+
+        settings = RemoteSettings(enabled = true, appShortcutsEnabled = false)
+        assertThat(policy.evaluate(request(channel = RemoteChannel.APP_SHORTCUT))).isEqualTo(PolicyDecision.Reject(RejectReason.DISABLED))
+        assertThat(policy.evaluate(request())).isEqualTo(PolicyDecision.Accept)
+    }
+
+    @Test
+    fun `S8 the rate limit is shared across channels`() {
+        settings = RemoteSettings(enabled = true, appShortcutsEnabled = true)
+        repeat(3) { policy.evaluate(request()) }
+        repeat(3) { policy.evaluate(request(channel = RemoteChannel.APP_SHORTCUT)) }
+
+        assertThat(
+            policy.evaluate(request(channel = RemoteChannel.APP_SHORTCUT)),
+        ).isEqualTo(PolicyDecision.Reject(RejectReason.RATE_LIMITED))
+    }
+
+    @Test
+    fun `app shortcuts are on by default, the notification channel is off`() {
+        assertThat(RemoteSettings().appShortcutsEnabled).isTrue()
+        assertThat(RemoteSettings().enabled).isFalse()
     }
 
     @Test

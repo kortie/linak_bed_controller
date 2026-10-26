@@ -64,6 +64,29 @@ class OnboardingViewModelTest {
 
         viewModel.onAction(OnboardingAction.Back)
 
-        assertThat(state).isEqualTo(OnboardingUiState())
+        assertThat(state.step).isEqualTo(OnboardingStep.INTRO)
+    }
+
+    @Test
+    fun `with permission already granted the steps count 1 of 2 then 2 of 2`() {
+        viewModel.onAction(OnboardingAction.PermissionChecked(granted = true))
+        assertThat(state.step).isEqualTo(OnboardingStep.INTRO)
+        assertThat(state.stepNumber to state.visibleSteps.size).isEqualTo(1 to 2)
+
+        viewModel.onAction(OnboardingAction.Start(permissionGranted = true))
+
+        assertThat(state.step).isEqualTo(OnboardingStep.CONNECT)
+        assertThat(state.stepNumber to state.visibleSteps.size).isEqualTo(2 to 2)
+    }
+
+    @Test
+    fun `without permission there are 3 steps, and granting midway keeps the count at 3`() {
+        viewModel.onAction(OnboardingAction.Start(permissionGranted = false))
+        assertThat(state.stepNumber to state.visibleSteps.size).isEqualTo(2 to 3)
+
+        viewModel.onAction(OnboardingAction.PermissionResult(granted = true))
+
+        assertThat(state.step).isEqualTo(OnboardingStep.CONNECT)
+        assertThat(state.stepNumber to state.visibleSteps.size).isEqualTo(3 to 3)
     }
 }

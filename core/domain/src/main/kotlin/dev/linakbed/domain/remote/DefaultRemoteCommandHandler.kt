@@ -1,7 +1,7 @@
 package dev.linakbed.domain.remote
 
 import dev.linakbed.domain.BedResult
-import dev.linakbed.domain.controller.BedController
+import dev.linakbed.domain.controller.BedActions
 import dev.linakbed.domain.controller.CommandSource
 import dev.linakbed.domain.log.ExecutionEntry
 import dev.linakbed.domain.port.Clock
@@ -21,10 +21,11 @@ import kotlin.time.Duration
 
 /**
  * [RemoteCommandHandler] 구현. 채널을 모른다 — [RemoteRequest]만 다룬다 (ADR-006).
+ * [controller]는 모든 침대 묶음이다 — 원격 명령은 연결된 모든 침대에 같은 번호로 (ADR-012).
  * 원격 요청의 결과·거절 기록은 여기서만 한다 (아키텍처 §5.3 실행 기록 책임).
  */
 class DefaultRemoteCommandHandler(
-    private val controller: BedController,
+    private val controller: BedActions,
     private val executionLog: ExecutionLog,
     private val settingsStore: RemoteSettingsStore,
     private val confirmation: MotionConfirmation,

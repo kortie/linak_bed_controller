@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  삼성 모드 및 루틴의 "앱 작업" · 런처 길게 누르기 (ADR-011, 02 문서 Part C1).
+  ID와 URI는 사용자가 만든 루틴이 참조하므로 배포 후 바꾸지 않는다.
+  targetPackage는 앱 ID와 같아야 한다 (ShortcutsXmlTest가 확인).
+-->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:icon="@drawable/ic_shortcut_preset"
+        android:shortcutId="preset_1"
+        android:shortcutLongLabel="@string/shortcut_preset_1_long"
+        android:shortcutShortLabel="@string/shortcut_preset_1">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="bedcontrol://shortcut/preset/1"
+            android:targetClass="dev.linakbed.app.shortcut.ShortcutActivity"
+            android:targetPackage="com.juanstudio.bedcontrol" />
+    </shortcut>
+    <shortcut
+        android:icon="@drawable/ic_shortcut_preset"
+        android:shortcutId="preset_2"
+        android:shortcutLongLabel="@string/shortcut_preset_2_long"
+        android:shortcutShortLabel="@string/shortcut_preset_2">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="bedcontrol://shortcut/preset/2"
+            android:targetClass="dev.linakbed.app.shortcut.ShortcutActivity"
+            android:targetPackage="com.juanstudio.bedcontrol" />
+    </shortcut>
+    <shortcut
+        android:icon="@drawable/ic_shortcut_preset"
+        android:shortcutId="preset_3"
+        android:shortcutLongLabel="@string/shortcut_preset_3_long"
+        android:shortcutShortLabel="@string/shortcut_preset_3">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="bedcontrol://shortcut/preset/3"
+            android:targetClass="dev.linakbed.app.shortcut.ShortcutActivity"
+            android:targetPackage="com.juanstudio.bedcontrol" />
+    </shortcut>
+    <shortcut
+        android:icon="@drawable/ic_shortcut_preset"
+        android:shortcutId="preset_4"
+        android:shortcutLongLabel="@string/shortcut_preset_4_long"
+        android:shortcutShortLabel="@string/shortcut_preset_4">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="bedcontrol://shortcut/preset/4"
+            android:targetClass="dev.linakbed.app.shortcut.ShortcutActivity"
+            android:targetPackage="com.juanstudio.bedcontrol" />
+    </shortcut>
+    <shortcut
+        android:icon="@drawable/ic_shortcut_stop"
+        android:shortcutId="stop"
+        android:shortcutLongLabel="@string/shortcut_stop_long"
+        android:shortcutShortLabel="@string/shortcut_stop">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="bedcontrol://shortcut/stop"
+            android:targetClass="dev.linakbed.app.shortcut.ShortcutActivity"
+            android:targetPackage="com.juanstudio.bedcontrol" />
+    </shortcut>
+</shortcuts>

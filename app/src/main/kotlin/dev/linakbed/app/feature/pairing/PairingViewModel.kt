@@ -8,7 +8,6 @@ import dev.linakbed.app.pairing.CompanionPairing
 import dev.linakbed.app.pairing.IdGenerator
 import dev.linakbed.app.pairing.PairingFilter
 import dev.linakbed.domain.model.PairedDevice
-import dev.linakbed.domain.port.BedLink
 import dev.linakbed.domain.port.PairingStore
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,8 +18,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * CompanionDeviceManager 페어링 (ADR-005). 페어링 정보를 쓰는 유일한 화면이라, 저장할 때 자기 상태도 함께 갱신한다.
+ * CompanionDeviceManager 페어링 (ADR-005). 침대를 추가(최대 2대, ADR-012)하거나 한 대씩 해제한다.
  * 같은 침대(MAC)를 다시 페어링하면 기존 bedId를 유지한다 (향후 클라우드 기기 ID, ADR-006).
+ * 해제한 침대의 연결은 BedFleet이 목록 변화를 보고 끊는다.
  */
 @HiltViewModel
 class PairingViewModel
@@ -28,7 +28,6 @@ class PairingViewModel
     constructor(
         private val pairing: CompanionPairing,
         private val store: PairingStore,
-        private val link: BedLink,
         private val ids: IdGenerator,
     ) : ViewModel() {
         private val mutableState = MutableStateFlow(PairingUiState())
@@ -37,10 +36,7 @@ class PairingViewModel
         private var associateJob: Job? = null
 
         init {
-            viewModelScope.launch {
-                val device = store.pairedDevice()
-                mutableState.update { it.copy(loaded = true, paired = device) }
-            }
+            viewModelScope.launch { store.observeAll().collect { beds -> mutableState.update { it.copy(loaded = true, beds = beds) } } }
         }
 
         fun onAction(action: PairingAction) {
@@ -48,7 +44,7 @@ class PairingViewModel
                 PairingAction.Pair -> pair()
                 PairingAction.SelectionLaunched -> mutableState.update { it.copy(pendingSelection = null) }
                 is PairingAction.SelectionResult -> if (!action.confirmed) cancelSelection()
-                PairingAction.Unpair -> unpair()
+                is PairingAction.Unpair -> unpair(action.bedId)
                 is PairingAction.FilterByName -> mutableState.update { it.copy(filterByName = action.enabled) }
                 is PairingAction.NamePatternChanged -> mutableState.update { it.copy(namePattern = action.pattern) }
                 PairingAction.MessageShown -> mutableState.update { it.copy(message = null) }
@@ -57,17 +53,25 @@ class PairingViewModel
 
         private fun pair() {
             val state = uiState.value
-            if (state.inProgress) return
-            val filter =
-                if (state.filterByName) {
-                    if (runCatching { Regex(state.namePattern) }.isFailure) {
-                        mutableState.update { it.copy(message = PairingMessage.InvalidPattern) }
-                        return
-                    }
-                    PairingFilter.NamePattern(state.namePattern)
-                } else {
-                    PairingFilter.ControlServiceUuid
+            when {
+                state.inProgress -> Unit
+                !state.canAdd -> mutableState.update { it.copy(message = PairingMessage.Full) }
+                else -> filterOf(state)?.let(::associate)
+            }
+        }
+
+        /** 이름 패턴이 잘못됐으면 안내하고 null. */
+        private fun filterOf(state: PairingUiState): PairingFilter? =
+            when {
+                !state.filterByName -> PairingFilter.ControlServiceUuid
+                runCatching { Regex(state.namePattern) }.isSuccess -> PairingFilter.NamePattern(state.namePattern)
+                else -> {
+                    mutableState.update { it.copy(message = PairingMessage.InvalidPattern) }
+                    null
                 }
+            }
+
+        private fun associate(filter: PairingFilter) {
             mutableState.update { it.copy(inProgress = true) }
             associateJob =
                 viewModelScope.launch {
@@ -83,22 +87,16 @@ class PairingViewModel
         }
 
         private suspend fun onCreated(event: AssociationEvent.Created) {
-            val previous = store.pairedDevice()
-            val sameBed = previous != null && previous.address.equals(event.address, ignoreCase = true)
-            if (previous != null && !sameBed) {
-                // 다른 침대로 바꿈: 이전 CDM 연결과 BLE 연결을 정리한다.
-                if (previous.cdmAssociationId >= 0) pairing.disassociate(previous.cdmAssociationId)
-                link.disconnect()
-            }
+            val previous = store.all().firstOrNull { it.address.equals(event.address, ignoreCase = true) }
             val device =
                 PairedDevice(
-                    bedId = if (sameBed) previous.bedId else ids.newId(),
+                    bedId = previous?.bedId ?: ids.newId(),
                     address = event.address,
                     name = event.name,
                     cdmAssociationId = event.associationId,
                 )
-            store.save(device)
-            mutableState.update { it.copy(inProgress = false, paired = device, message = PairingMessage.Paired(device.name)) }
+            val message = if (store.save(device)) PairingMessage.Paired(device.name) else PairingMessage.Full
+            mutableState.update { it.copy(inProgress = false, message = message) }
         }
 
         private fun cancelSelection() {
@@ -107,13 +105,12 @@ class PairingViewModel
             mutableState.update { it.copy(inProgress = false, pendingSelection = null, message = PairingMessage.Cancelled) }
         }
 
-        private fun unpair() {
-            val device = uiState.value.paired ?: return
+        private fun unpair(bedId: String) {
+            val device = uiState.value.beds.firstOrNull { it.bedId == bedId } ?: return
             viewModelScope.launch {
                 if (device.cdmAssociationId >= 0) pairing.disassociate(device.cdmAssociationId)
-                store.save(null)
-                link.disconnect()
-                mutableState.update { it.copy(paired = null, message = PairingMessage.Unpaired) }
+                store.remove(bedId)
+                mutableState.update { it.copy(message = PairingMessage.Unpaired) }
             }
         }
     }

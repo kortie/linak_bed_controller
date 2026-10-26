@@ -58,8 +58,8 @@ fun HoldToMoveButton(
                     )
                 },
     ) {
-        Text(label, style = MaterialTheme.typography.headlineSmall)
+        Text(label, style = MaterialTheme.typography.titleMedium)
     }
 }
 
-private const val MIN_SIZE = 64
+private const val MIN_SIZE = 48
