@@ -16,22 +16,16 @@ import dev.linakbed.app.service.ServiceStarter
 import dev.linakbed.app.service.ServiceTask
 import dev.linakbed.domain.controller.BedActions
 import dev.linakbed.domain.controller.ControllerEnvironment
-import dev.linakbed.domain.log.BedLogger
 import dev.linakbed.domain.port.Clock
 import dev.linakbed.domain.port.ExecutionLog
 import dev.linakbed.domain.port.MotionConfirmation
-import dev.linakbed.domain.port.NotificationChannelSettingsStore
-import dev.linakbed.domain.port.PresetNameStore
 import dev.linakbed.domain.port.RemoteRequestDispatcher
 import dev.linakbed.domain.port.RemoteSettingsStore
 import dev.linakbed.domain.remote.DefaultRemoteCommandHandler
 import dev.linakbed.domain.remote.RemoteCommandHandler
-import dev.linakbed.domain.remote.notification.NotificationChannel
-import dev.linakbed.smartthings.NotificationBridge
-import kotlinx.coroutines.CoroutineScope
 import javax.inject.Singleton
 
-/** SmartThings 루틴 알림 → 원격 명령 실행 경로 (ADR-002, S07). */
+/** 원격 명령 실행 경로: 앱 바로가기(삼성 모드 및 루틴, ADR-011) → 수용 정책·실행 전 대기 → 서비스 실행 (ADR-013). */
 @Module
 @InstallIn(SingletonComponent::class)
 object RemoteModule {
@@ -96,22 +90,4 @@ object RemoteModule {
 
     @Provides
     fun provideRemoteRequestDispatcher(dispatcher: ServiceRemoteRequestDispatcher): RemoteRequestDispatcher = dispatcher
-
-    @Provides
-    @Singleton
-    fun provideNotificationChannel(
-        settings: NotificationChannelSettingsStore,
-        presetNames: PresetNameStore,
-        handler: RemoteCommandHandler,
-    ): NotificationChannel = NotificationChannel(settings, presetNames, handler)
-
-    @Provides
-    @Singleton
-    fun provideNotificationBridge(
-        channel: NotificationChannel,
-        dispatcher: RemoteRequestDispatcher,
-        settings: NotificationChannelSettingsStore,
-        @ApplicationScope scope: CoroutineScope,
-        logger: BedLogger,
-    ): NotificationBridge = NotificationBridge(channel, dispatcher, settings, scope, logger)
 }

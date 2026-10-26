@@ -12,7 +12,7 @@ import kotlin.time.toJavaDuration
 /** 02 문서 A3 공통 수용 정책 (S8). 알림 채널 타입을 쓰지 않는다 — 향후 채널도 같은 테스트로 보호된다. */
 class RemoteCommandPolicyTest {
     private val clock = FakeClock()
-    private var settings = RemoteSettings(enabled = true)
+    private var settings = RemoteSettings()
     private val policy = RemoteCommandPolicy({ settings }, clock)
     private var counter = 0
 
@@ -21,7 +21,7 @@ class RemoteCommandPolicyTest {
         receivedAt: Instant = clock.now(),
         sentAt: Instant? = null,
         command: RemoteCommand = RemoteCommand.Preset(PresetSlot.P1),
-        channel: RemoteChannel = RemoteChannel.SMARTTHINGS_NOTIFICATION,
+        channel: RemoteChannel = RemoteChannel.APP_SHORTCUT,
     ) = RemoteRequest(id, channel, command, receivedAt, sentAt)
 
     private fun Instant.minus(seconds: Long): Instant = minus(seconds.seconds.toJavaDuration())
@@ -33,37 +33,22 @@ class RemoteCommandPolicyTest {
 
     @Test
     fun `S8 disabled feature rejects first, before anything else`() {
-        settings = settings.copy(enabled = false)
+        settings = settings.copy(appShortcutsEnabled = false)
 
         assertThat(policy.evaluate(request(receivedAt = clock.now().minus(600)))).isEqualTo(PolicyDecision.Reject(RejectReason.DISABLED))
     }
 
     @Test
-    fun `S8 each channel has its own switch`() {
-        settings = RemoteSettings(enabled = false, appShortcutsEnabled = true)
-        assertThat(policy.evaluate(request(channel = RemoteChannel.APP_SHORTCUT))).isEqualTo(PolicyDecision.Accept)
-        assertThat(policy.evaluate(request())).isEqualTo(PolicyDecision.Reject(RejectReason.DISABLED))
-
-        settings = RemoteSettings(enabled = true, appShortcutsEnabled = false)
-        assertThat(policy.evaluate(request(channel = RemoteChannel.APP_SHORTCUT))).isEqualTo(PolicyDecision.Reject(RejectReason.DISABLED))
+    fun `S14 the removed SmartThings channel is always rejected as disabled`() {
+        assertThat(
+            policy.evaluate(request(channel = RemoteChannel.SMARTTHINGS_NOTIFICATION)),
+        ).isEqualTo(PolicyDecision.Reject(RejectReason.DISABLED))
         assertThat(policy.evaluate(request())).isEqualTo(PolicyDecision.Accept)
     }
 
     @Test
-    fun `S8 the rate limit is shared across channels`() {
-        settings = RemoteSettings(enabled = true, appShortcutsEnabled = true)
-        repeat(3) { policy.evaluate(request()) }
-        repeat(3) { policy.evaluate(request(channel = RemoteChannel.APP_SHORTCUT)) }
-
-        assertThat(
-            policy.evaluate(request(channel = RemoteChannel.APP_SHORTCUT)),
-        ).isEqualTo(PolicyDecision.Reject(RejectReason.RATE_LIMITED))
-    }
-
-    @Test
-    fun `app shortcuts are on by default, the notification channel is off`() {
+    fun `app shortcuts are on by default`() {
         assertThat(RemoteSettings().appShortcutsEnabled).isTrue()
-        assertThat(RemoteSettings().enabled).isFalse()
     }
 
     @Test
@@ -111,9 +96,9 @@ class RemoteCommandPolicyTest {
 
     @Test
     fun `S8 rejected requests do not count toward duplicates or the rate limit`() {
-        settings = settings.copy(enabled = false)
+        settings = settings.copy(appShortcutsEnabled = false)
         repeat(10) { policy.evaluate(request(id = "x")) }
-        settings = settings.copy(enabled = true)
+        settings = settings.copy(appShortcutsEnabled = true)
 
         assertThat(policy.evaluate(request(id = "x"))).isEqualTo(PolicyDecision.Accept)
     }

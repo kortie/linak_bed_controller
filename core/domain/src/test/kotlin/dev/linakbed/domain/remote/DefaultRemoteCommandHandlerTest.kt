@@ -31,14 +31,14 @@ import kotlin.time.Duration.Companion.seconds
 class DefaultRemoteCommandHandlerTest {
     private val controller = FakeBedController()
     private val log = FakeExecutionLog()
-    private val settings = FakeRemoteSettingsStore(RemoteSettings(enabled = true, preExecutionDelay = Duration.ZERO))
+    private val settings = FakeRemoteSettingsStore(RemoteSettings(preExecutionDelay = Duration.ZERO))
     private val confirmation = FakeMotionConfirmation()
     private val clock = FakeClock()
     private val handler = DefaultRemoteCommandHandler(controller, log, settings, confirmation, clock)
     private var counter = 0
 
     private fun request(command: RemoteCommand = RemoteCommand.Preset(PresetSlot.P2)) =
-        RemoteRequest("req-${++counter}", RemoteChannel.SMARTTHINGS_NOTIFICATION, command, clock.now(), null)
+        RemoteRequest("req-${++counter}", RemoteChannel.APP_SHORTCUT, command, clock.now(), null)
 
     private fun TestScope.advance(duration: Duration) {
         advanceTimeBy(duration)
@@ -56,7 +56,7 @@ class DefaultRemoteCommandHandlerTest {
                 assertThat(controller.calls).containsExactly("preset P2 REMOTE")
                 val entry = log.entries.single()
                 assertThat(entry.source).isEqualTo(CommandSource.REMOTE)
-                assertThat(entry.channel).isEqualTo(RemoteChannel.SMARTTHINGS_NOTIFICATION)
+                assertThat(entry.channel).isEqualTo(RemoteChannel.APP_SHORTCUT)
                 assertThat(entry.requestId).isEqualTo("req-1")
                 assertThat(entry.action).isEqualTo("preset P2")
                 assertThat(entry.result).isEqualTo("executed")
@@ -86,7 +86,7 @@ class DefaultRemoteCommandHandlerTest {
         @Test
         fun `policy rejections are recorded and never reach the controller`() =
             runTest {
-                settings.current.value = settings.current.value.copy(enabled = false)
+                settings.current.value = settings.current.value.copy(appShortcutsEnabled = false)
 
                 val outcome = handler.handle(request())
 
@@ -98,12 +98,12 @@ class DefaultRemoteCommandHandlerTest {
         @Test
         fun `channel rejections are recorded with the masked detail`() =
             runTest {
-                handler.reject(RemoteChannel.SMARTTHINGS_NOTIFICATION, "req-x", RejectReason.AUTH_FAILED, "#BED **** preset 3")
+                handler.reject(RemoteChannel.APP_SHORTCUT, "req-x", RejectReason.AUTH_FAILED, "unknown shortcut")
 
                 val entry = log.entries.single()
                 assertThat(entry.requestId).isEqualTo("req-x")
                 assertThat(entry.result).isEqualTo("rejected:AUTH_FAILED")
-                assertThat(entry.detail).isEqualTo("#BED **** preset 3")
+                assertThat(entry.detail).isEqualTo("unknown shortcut")
                 assertThat(entry.action).isEqualTo("-")
             }
 
