@@ -23,6 +23,7 @@ import dev.linakbed.app.feature.home.HomeScreen
 import dev.linakbed.app.feature.log.ExecutionLogScreen
 import dev.linakbed.app.feature.routines.RoutinesScreen
 import dev.linakbed.app.feature.settings.SettingsScreen
+import dev.linakbed.app.ui.LanguageToggle
 
 /** 침대가 연결된 뒤의 화면들: 홈 → 설정(하위 화면) / 정보. */
 @Composable
@@ -58,6 +59,7 @@ private fun NavGraphBuilder.page(
         Column {
             TopAppBar(
                 title = { Text(stringResource(title)) },
+                actions = { LanguageToggle() },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.common_back))

@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Bed Remote - LINAK, HANSAEM Compatible</string>
+    <!-- 홈 화면 아이콘 아래 표시 (길면 잘림) -->
+    <string name="app_label_launcher">Bed Remote</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="language_change">Change language</string>
+    <string name="common_loading">Loading…</string>
+
+    <string name="nav_settings">Settings</string>
+
+    <string name="permission_ble_title">Bluetooth permission needed</string>
+    <string name="permission_ble_rationale">To connect to the bed over Bluetooth, the ‘Nearby devices’ permission is required. Location is not used.</string>
+    <string name="permission_ble_request">Allow permission</string>
+    <string name="permission_open_settings">Open app settings</string>
+
+    <string name="control_stop">Stop</string>
+    <string name="control_stop_description">Stop the bed</string>
+    <string name="control_head">Head</string>
+    <string name="control_feet">Feet</string>
+    <string name="control_both">All</string>
+    <string name="control_up">▲ Raise</string>
+    <string name="control_down">▼ Lower</string>
+    <string name="control_move_description">%1$s %2$s (while held)</string>
+    <string name="control_light">Light</string>
+
+    <string name="link_connected">Connected</string>
+    <string name="link_connecting">Connecting…</string>
+    <string name="light_on">On</string>
+    <string name="light_off">Off</string>
+    <string name="light_unknown">Unknown</string>
+
+    <string name="control_presets">Presets</string>
+    <string name="preset_fallback_name">Preset %1$d</string>
+    <string name="preset_arrived">The bed reached the %1$s position.</string>
+    <string name="preset_saved">Saved the current position as %1$s.</string>
+    <string name="preset_save_title">Overwrite preset</string>
+    <string name="preset_save_message">This will overwrite ‘%1$s’ with the bed’s current position. The previous position cannot be restored.</string>
+    <string name="preset_save_check">I confirm the overwrite</string>
+    <string name="preset_save_confirm">Overwrite</string>
+    <string name="preset_rename_title">Rename preset</string>
+    <string name="preset_rename_confirm">Rename</string>
+    <string name="preset_rename_routine_warning">Renaming does not change the position saved on the bed.</string>
+    <string name="preset_name_blank">Enter a name.</string>
+    <string name="preset_name_too_long">Name too long (limit: %1$d).</string>
+    <string name="preset_name_line_break">Line breaks are not allowed.</string>
+    <string name="preset_name_digits_only">Names made only of digits are not allowed (they are easy to confuse with slot numbers).</string>
+    <string name="preset_name_duplicate">This name is the same as ‘%1$s’.</string>
+
+    <string name="pairing_title">Connect bed</string>
+    <string name="pairing_none">No bed is connected.</string>
+    <string name="pairing_unnamed">(No name)</string>
+    <string name="pairing_filter_by_name">Search by name (when the bed doesn’t appear in the list)</string>
+    <string name="pairing_name_pattern">Name pattern (regex)</string>
+    <string name="pairing_pair">Connect bed</string>
+    <string name="pairing_unpair">Disconnect</string>
+    <string name="pairing_unpair_confirm_title">Disconnect?</string>
+    <string name="pairing_unpair_confirm_message">To use the bed again, you will need to connect it again.</string>
+    <string name="pairing_done">Connected to %1$s.</string>
+    <string name="pairing_cancelled">Device selection was cancelled.</string>
+    <string name="pairing_failed">Could not connect: %1$s</string>
+    <string name="pairing_invalid_pattern">The name pattern is not a valid regular expression.</string>
+    <string name="pairing_unpaired">Disconnected.</string>
+
+    <string name="error_not_paired">No bed is connected. Connect a bed in Settings.</string>
+    <string name="error_bluetooth_off">Bluetooth is off.</string>
+    <string name="error_permission_missing">Bluetooth connection permission is required.</string>
+    <string name="error_connect_timeout">Could not connect to the bed. Check the bed’s power and the distance.</string>
+    <string name="error_disconnected">The connection to the bed was lost.</string>
+    <string name="error_busy_manual">Not run because the bed is being controlled manually in the app.</string>
+    <string name="error_busy_remote">A remote command is running.</string>
+    <string name="error_safety_max_duration">The bed moved for too long, so it was stopped for safety.</string>
+    <string name="error_safety_disconnected">The connection dropped, so the bed was stopped for safety.</string>
+    <string name="error_safety_stall">No movement was detected, so the bed was stopped for safety.</string>
+    <string name="error_write_failed">Could not send the command (code %1$d).</string>
+    <string name="error_gatt_failure">Could not communicate with the bed (%1$s).</string>
+    <string name="error_interrupted_manual">Interrupted by manual control.</string>
+    <string name="error_interrupted_remote">Interrupted by another request.</string>
+    <!-- S07: 알림 -->
+    <string name="channel_service">Running remote commands</string>
+    <string name="channel_alerts">Remote command results</string>
+    <string name="channel_confirm">Confirm before running</string>
+    <string name="service_running">Running a routine command</string>
+    <string name="remote_result_executed">Bed: %1$s ran.</string>
+    <string name="remote_result_failed">Remote command failed (%1$s): %2$s</string>
+    <string name="remote_channel_smartthings">SmartThings</string>
+    <string name="confirm_title">The bed will move to %1$s</string>
+    <string name="confirm_text">Press to cancel</string>
+    <string name="confirm_cancel">Cancel</string>
+    <string name="confirm_cancel_description">Cancel the bed movement</string>
+    <string name="confirm_moving_to">The bed will move to ‘%1$s’</string>
+    <string name="confirm_preset_unknown">Preset</string>
+    <string name="confirm_seconds">%1$d s</string>
+
+    <!-- S07: 설정 목록 -->
+    <string name="settings_log">Run history</string>
+    <string name="settings_diagnostics">Diagnostics</string>
+    <string name="common_back">Back</string>
+
+    <string name="remote_fix">Set up</string>
+    <string name="remote_delay">Wait before running (time to cancel)</string>
+    <string name="remote_delay_off">Off</string>
+    <string name="remote_delay_seconds">%1$d s</string>
+    <string name="remote_notify_success">Send a notification even on success</string>
+    <string name="check_bluetooth">Bluetooth connection permission</string>
+    <string name="check_paired">Bed connection (pairing)</string>
+    <string name="check_post_notifications">Allow notifications</string>
+    <string name="check_full_screen">Allow full-screen notifications (cancel screen before running)</string>
+
+    <!-- S07: 루틴 설정 방법 (02 문서 Part B §5와 같게 유지) -->
+
+    <!-- S07: 실행 기록 -->
+    <string name="log_empty">No history.</string>
+    <string name="log_source_manual">Manual</string>
+    <string name="log_line">%1$s · %2$s · %3$s</string>
+
+    <!-- S07: 진단 -->
+    <string name="diag_ok">OK</string>
+    <string name="diag_needed">Needed</string>
+    <string name="diag_fallback_warning">The background service could not start recently, so the command ran through a fallback path (%1$s). If this keeps happening, set this app to ‘Unrestricted’ under Settings → Battery.</string>
+    <string name="diag_logs">Logs</string>
+    <string name="diag_log_dir">Log location: %1$s</string>
+    <string name="diag_export">Export logs</string>
+    <string name="diag_export_empty">There are no logs to export.</string>
+    <!-- S09 홈 · 연결 안내 · 정보 (ADR-009, ADR-010) -->
+    <string name="home_reconnect">Reconnect</string>
+    <string name="home_open_settings">Settings</string>
+    <string name="home_open_about">About</string>
+    <string name="home_preset_hint">Long-press Custom to save the current position as Custom</string>
+    <string name="home_preset_go">Move to this position</string>
+    <string name="home_preset_edit">Save current position as Custom</string>
+    <string name="home_preset_save_here">Save current position as Custom</string>
+    <string name="home_preset_save_here_desc">You will be asked to confirm before saving</string>
+    <string name="home_light">Light · %1$s</string>
+
+    <string name="onboarding_step">%1$d / %2$d</string>
+    <string name="onboarding_intro_title">Control your bed from your phone</string>
+    <string name="onboarding_intro_body">Adjust head and feet height, save and recall favorite positions (presets), and set a morning wake-up position with Samsung Modes and Routines. First, connect your bed.</string>
+    <string name="onboarding_start">Get started</string>
+    <string name="onboarding_permission_denied">Without permission, the app cannot connect to the bed. Allow ‘Permissions → Nearby devices’ in the app settings.</string>
+    <string name="onboarding_connect_title">Connect bed</string>
+    <string name="onboarding_connect_body">Turn on the bed and keep your phone close to it. Tap ‘Find bed’ and choose your bed from the list.</string>
+    <string name="onboarding_find_bed">Find bed</string>
+    <string name="pairing_not_found">Don’t see your bed in the list?</string>
+    <string name="pairing_not_found_desc">Some beds can only be found by name. Turn this on, then tap ‘Find bed’ again.</string>
+
+    <string name="settings_log_desc">Recent bed activity</string>
+    <string name="settings_diagnostics_desc">Check the status when something goes wrong · logs to send to the developer</string>
+
+    <string name="about_title">About</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_unofficial">Not an official app of LINAK® or HANSAEM. This is an independent app compatible with electric beds that use a LINAK controller.</string>
+    <string name="about_developer">Developer</string>
+    <string name="about_privacy">Privacy</string>
+    <string name="about_privacy_body">This app creates no account and sends no data off your device. It does not read other apps’ notifications. Troubleshooting logs are stored only on your device and are shared only when you export them yourself. Donation payments are handled by Google Play, and the app never receives card or other payment details.</string>
+    <string name="about_privacy_policy">View privacy policy</string>
+    <string name="about_licenses">Open-source licenses</string>
+    <string name="about_licenses_body">This app uses Android Jetpack (AndroidX, Compose, Room, DataStore, Navigation), Kotlin · kotlinx.coroutines, and Dagger · Hilt. All are licensed under the Apache License 2.0.</string>
+    <string name="about_licenses_apache">View the full Apache License 2.0</string>
+    <string name="about_donation_title">Buy the developer a coffee</string>
+    <string name="about_donation_body">If you like the app, you can support the developer with the price of a coffee. Payment goes through Google Play. Donations are optional and do not affect app features.</string>
+    <string name="about_donation_button">Buy a coffee · %1$s</string>
+    <string name="about_donation_thanks">Thank you for your support!</string>
+    <string name="about_donation_pending">Your donation will be completed once the payment is confirmed.</string>
+    <string name="about_donation_failed">The payment could not be completed. Please try again later.</string>
+    <string name="about_no_app">No app is available to open it</string>
+
+    <!-- S10 기기 화면 -->
+    <string name="arrow_up">▲</string>
+    <string name="arrow_down">▼</string>
+    <string name="home_bed_description">Bed shape</string>
+    <string name="home_bed_state">Head %1$d%% · Feet %2$d%%</string>
+    <string name="home_bed_unknown">No height information</string>
+
+    <!-- S11 삼성 모드 및 루틴 · 앱 바로가기 (ADR-011) -->
+    <string name="shortcut_preset_1">Move to Preset 1</string>
+    <string name="shortcut_preset_2">Move to Preset 2</string>
+    <string name="shortcut_preset_3">Move to Preset 3</string>
+    <string name="shortcut_preset_4">Move to Custom</string>
+    <string name="shortcut_preset_1_long">Move the bed to the Preset 1 position</string>
+    <string name="shortcut_preset_2_long">Move the bed to the Preset 2 position</string>
+    <string name="shortcut_preset_3_long">Move the bed to the Preset 3 position</string>
+    <string name="shortcut_preset_4_long">Move the bed to the Custom position</string>
+    <string name="shortcut_stop">Stop bed</string>
+    <string name="shortcut_stop_long">Stop bed movement</string>
+    <string name="remote_channel_shortcut">Modes and Routines · shortcut</string>
+    <string name="settings_routines">Samsung Modes and Routines</string>
+    <string name="settings_routines_desc">Move to a preset or stop with a routine app action</string>
+    <string name="routines_enabled">Move the bed with Modes and Routines</string>
+    <string name="routines_enabled_desc">When off, commands from routines or shortcuts are not run. They are only recorded in the run history.</string>
+    <string name="routines_how_title">How to set up</string>
+    <string name="routines_step1">1. Settings → Modes and Routines → Routines → +</string>
+    <string name="routines_step2">2. Condition: time, alarm dismissed, or another condition you want</string>
+    <string name="routines_step3">3. Action: Apps → Open app or run app action → Bed Remote → ‘Move to Preset 2’ or ‘Stop bed’</string>
+    <string name="routines_step4">4. Before a preset move, a large cancel screen appears. If you leave it alone, the bed moves.</string>
+    <string name="routines_launcher_note">You can also long-press the app icon on the home screen to see the same shortcuts.</string>
+    <string name="routines_recommended">For smooth operation</string>
+
+    <!-- S12 프리셋 그림 · Custom -->
+    <string name="preset_custom">Custom</string>
+    <string name="preset_icon">Preset %1$d</string>
+    <string name="preset_icon_unknown">Preset %1$d, position unknown</string>
+
+    <!-- S13 침대 여러 대 -->
+    <string name="pairing_add">Add bed</string>
+    <string name="pairing_max">Bed limit reached (max: %1$d).</string>
+    <string name="home_add_bed_title">Add bed</string>
+    <string name="home_add_bed_body">Turn on the second bed and keep your phone close to it. Routine presets and stop commands move all connected beds together.</string>
+    <string name="routines_name_note">Shortcut names are fixed as ‘Move to Preset N’ and ‘Move to Custom’. With several beds, all connected beds move together.</string>
+</resources>

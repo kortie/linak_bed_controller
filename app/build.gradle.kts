@@ -21,16 +21,8 @@ android {
         // 개인정보 처리방침 공개 URL (Play 등록 시 필요). 비어 있으면 정보 화면에 링크를 표시하지 않는다.
         buildConfigField("String", "PRIVACY_POLICY_URL", "\"\"")
 
-        // 커피값 후원 (ADR-010): app/donation.properties
-        val donation = Properties().apply { file("donation.properties").reader().use(::load) }
-
-        fun donationString(key: String) = "\"${donation.getProperty(key, "").trim()}\""
-        buildConfigField("boolean", "DONATION_ENABLED", donation.getProperty("donation.enabled", "false").trim())
-        buildConfigField("String", "DONATION_RECIPIENT", donationString("donation.recipient"))
-        buildConfigField("long", "DONATION_CHAIN_ID", "${donation.getProperty("donation.chainId", "0").trim()}L")
-        buildConfigField("String", "DONATION_NETWORK_NAME", donationString("donation.networkName"))
-        buildConfigField("String", "DONATION_TOKEN_CONTRACT", donationString("donation.tokenContract"))
-        buildConfigField("int", "DONATION_TOKEN_DECIMALS", donation.getProperty("donation.tokenDecimals", "0").trim())
+        // 커피 한 잔 후원 (ADR-014): Play Console의 소모성 인앱 상품 ID. 바꾸면 Play Console 상품도 같이.
+        buildConfigField("String", "DONATION_PRODUCT_ID", "\"coffee\"")
     }
 
     // Google Play 업로드 키 (docs/play/release-checklist.md). keystore.properties·키 파일은 커밋하지 않는다.
@@ -78,6 +70,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.play.billing)
     implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.kotlinx.coroutines.android)

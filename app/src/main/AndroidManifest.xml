@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- 인터넷 권한 없음 (개인정보 안내). Play 결제 라이브러리의 진단 전송(datatransport)이 끌어오는 권한을 지운다.
+         결제 자체는 기기 안의 Play 스토어 앱과 통신하므로 영향 없음 (ADR-014, BillingPermissionsTest) -->
+    <uses-permission
+        android:name="android.permission.INTERNET"
+        tools:node="remove" />
+    <uses-permission
+        android:name="android.permission.ACCESS_NETWORK_STATE"
+        tools:node="remove" />
 
     <!-- CompanionDeviceManager 페어링 + 백그라운드에서 포그라운드 서비스 시작 예외 (ADR-005, 아키텍처 §11) -->
     <uses-feature

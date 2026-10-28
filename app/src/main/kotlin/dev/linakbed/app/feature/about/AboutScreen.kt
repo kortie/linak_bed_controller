@@ -1,11 +1,10 @@
 package dev.linakbed.app.feature.about
 
 import android.content.ActivityNotFoundException
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,18 +16,19 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.linakbed.app.BuildConfig
 import dev.linakbed.app.R
 import dev.linakbed.app.ui.theme.LinakBedTheme
@@ -39,7 +39,6 @@ data class AboutInfo(
     val developerName: String = BuildConfig.DEVELOPER_NAME,
     val developerEmail: String = BuildConfig.DEVELOPER_EMAIL,
     val privacyPolicyUrl: String = BuildConfig.PRIVACY_POLICY_URL,
-    val donation: DonationConfig = DonationConfig.fromBuildConfig(),
 )
 
 /** 앱 밖으로 넘기는 동작 (테스트에서 바꿔 끼운다). */
@@ -47,19 +46,29 @@ interface AboutActions {
     fun open(uri: String)
 
     fun email(address: String)
-
-    fun copy(text: String)
 }
 
 @Composable
-fun AboutScreen(info: AboutInfo = AboutInfo()) {
+fun AboutScreen(
+    info: AboutInfo = AboutInfo(),
+    donationViewModel: DonationViewModel = hiltViewModel(),
+) {
     val context = LocalContext.current
-    AboutContent(info, rememberAboutActions(context))
+    val activity = LocalActivity.current
+    val donation by donationViewModel.uiState.collectAsStateWithLifecycle()
+    AboutContent(
+        info = info,
+        donation = donation,
+        onDonate = { activity?.let(donationViewModel::donate) },
+        actions = rememberAboutActions(context),
+    )
 }
 
 @Composable
 fun AboutContent(
     info: AboutInfo,
+    donation: DonationUiState,
+    onDonate: () -> Unit,
     actions: AboutActions,
     modifier: Modifier = Modifier,
 ) {
@@ -70,7 +79,7 @@ fun AboutContent(
         Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineSmall)
         Text(stringResource(R.string.about_version, info.version), style = MaterialTheme.typography.bodyMedium)
         Text(stringResource(R.string.about_unofficial), style = MaterialTheme.typography.bodySmall)
-        DonationLink.metaMask(info.donation)?.let { link -> DonationCard(info.donation, link, actions) }
+        donation.price?.let { price -> DonationCard(price, donation.status, onDonate) }
         HorizontalDivider()
         Section(stringResource(R.string.about_developer)) {
             if (info.developerName.isNotBlank()) Text(info.developerName, style = MaterialTheme.typography.bodyLarge)
@@ -93,9 +102,9 @@ fun AboutContent(
 
 @Composable
 private fun DonationCard(
-    config: DonationConfig,
-    link: String,
-    actions: AboutActions,
+    price: String,
+    status: DonationStatus,
+    onDonate: () -> Unit,
 ) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
@@ -104,19 +113,34 @@ private fun DonationCard(
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(stringResource(R.string.about_donation_title), style = MaterialTheme.typography.titleMedium)
             Text(stringResource(R.string.about_donation_body), style = MaterialTheme.typography.bodyMedium)
-            Button(onClick = { actions.open(link) }, modifier = Modifier.fillMaxWidth()) {
-                Text(stringResource(R.string.about_donation_button, config.amountUnits))
+            Button(onClick = onDonate, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(R.string.about_donation_button, price))
             }
-            Text(
-                stringResource(R.string.about_donation_network, config.networkName),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.error,
-            )
-            Text(config.recipient, style = MaterialTheme.typography.bodySmall, fontFamily = FontFamily.Monospace)
-            OutlinedButton(onClick = { actions.copy(config.recipient) }) { Text(stringResource(R.string.about_donation_copy)) }
+            statusMessage(status)?.let { message ->
+                Text(
+                    stringResource(message),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color =
+                        if (status ==
+                            DonationStatus.FAILED
+                        ) {
+                            MaterialTheme.colorScheme.error
+                        } else {
+                            MaterialTheme.colorScheme.onTertiaryContainer
+                        },
+                )
+            }
         }
     }
 }
+
+private fun statusMessage(status: DonationStatus): Int? =
+    when (status) {
+        DonationStatus.IDLE -> null
+        DonationStatus.THANKS -> R.string.about_donation_thanks
+        DonationStatus.PENDING -> R.string.about_donation_pending
+        DonationStatus.FAILED -> R.string.about_donation_failed
+    }
 
 @Composable
 private fun Section(
@@ -132,16 +156,10 @@ private fun Section(
 @Composable
 private fun rememberAboutActions(context: Context): AboutActions {
     val noApp = stringResource(R.string.about_no_app)
-    val copied = stringResource(R.string.about_donation_copied)
     return object : AboutActions {
         override fun open(uri: String) = start(Intent(Intent.ACTION_VIEW, uri.toUri()))
 
         override fun email(address: String) = start(Intent(Intent.ACTION_SENDTO, "mailto:$address".toUri()))
-
-        override fun copy(text: String) {
-            context.getSystemService(ClipboardManager::class.java)?.setPrimaryClip(ClipData.newPlainText("address", text))
-            Toast.makeText(context, copied, Toast.LENGTH_SHORT).show()
-        }
 
         private fun start(intent: Intent) {
             try {
@@ -169,15 +187,14 @@ private fun AboutPreview() {
                     developerName = "juanStudio",
                     developerEmail = "kortie00@gmail.com",
                     privacyPolicyUrl = "",
-                    donation = DonationConfig(true, "", 1, "Ethereum", "0xdAC17F958D2ee523a2206206994597C13D831ec7", 6),
                 ),
+            donation = DonationUiState(price = "₩1,500"),
+            onDonate = {},
             actions =
                 object : AboutActions {
                     override fun open(uri: String) = Unit
 
                     override fun email(address: String) = Unit
-
-                    override fun copy(text: String) = Unit
                 },
         )
     }

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Protocol Lab (debug 빌드 전용) -->
+<resources>
+    <string name="protolab_title">Protocol Lab</string>
+    <string name="protolab_stop">STOP</string>
+    <string name="protolab_safety_notice">Before an experiment, check that no people or objects are above or below the bed.</string>
+    <string name="protolab_section_device">Device</string>
+    <string name="protolab_scan">Scan</string>
+    <string name="protolab_scan_stop">Stop scan</string>
+    <string name="protolab_connect">Connect</string>
+    <string name="protolab_disconnect">Disconnect</string>
+    <string name="protolab_link_state">Connection state: %1$s</string>
+    <string name="protolab_device_row">%1$s · %2$s · %3$d dBm · advertises control UUID: %4$s</string>
+    <string name="protolab_unnamed">(No name)</string>
+    <string name="protolab_section_sensors">Sensors</string>
+    <string name="protolab_sensor_row">%1$s: %2$s</string>
+    <string name="protolab_section_commands">Commands</string>
+    <string name="protolab_send">Once</string>
+    <string name="protolab_repeat">Repeat</string>
+    <string name="protolab_repeating">Repeating: %1$s</string>
+    <string name="protolab_interval">Repeat interval: %1$d ms</string>
+    <string name="protolab_section_raw">Raw 2 bytes</string>
+    <string name="protolab_raw_hint">e.g. 0b00</string>
+    <string name="protolab_send_raw">Send</string>
+    <string name="protolab_section_save">Save preset</string>
+    <string name="protolab_save_menu">Save preset menu…</string>
+    <string name="protolab_save_menu_title">Save preset</string>
+    <string name="protolab_save_menu_warning">This overwrites the hardware preset with the bed’s current position. Only experiment with slots you are not using.</string>
+    <string name="protolab_save_slot">Save to P%1$d</string>
+    <string name="protolab_save_confirm_title">Overwrite P%1$d</string>
+    <string name="protolab_save_confirm_message">Overwrite P%1$d? The current position will be saved there, and this cannot be undone.</string>
+    <string name="protolab_confirm">Overwrite</string>
+    <string name="protolab_cancel">Cancel</string>
+    <string name="protolab_section_services">GATT services</string>
+    <string name="protolab_section_log">Log</string>
+    <string name="protolab_copy">Copy result</string>
+    <string name="protolab_copied">Copied to the clipboard</string>
+    <string name="protolab_clear">Clear</string>
+    <string name="protolab_permissions_denied">Bluetooth scan and connect permissions are required</string>
+    <string name="protolab_section_controller">Controller (through the safety supervisor)</string>
+    <string name="protolab_controller_target">Use the selected device as the controller target</string>
+    <string name="protolab_controller_preset">P%1$d</string>
+    <string name="protolab_controller_hold_hint">Moves only while pressed (releasing stops it)</string>
+    <string name="protolab_controller_stop">Controller STOP</string>
+
+    <!-- 가상 침대 (debug 빌드 전용) -->
+    <string name="simbed_title">Virtual bed</string>
+    <string name="simbed_notice">Debug builds only. When connected to a virtual bed, commands go to the in-app simulation instead of BLE. Use control, presets and Modes and Routines in the regular app screens as usual. No real bed moves.</string>
+    <string name="simbed_card_title">Virtual bed %1$d</string>
+    <string name="simbed_full">Two beds are already connected.</string>
+    <string name="simbed_pair">Connect to the virtual bed and open the app</string>
+    <string name="simbed_open_app">Open the Bed Remote app</string>
+    <string name="simbed_unpair">Disconnect this virtual bed</string>
+    <string name="simbed_link">Link: %1$s</string>
+    <string name="simbed_height">%1$s: %2$.1f cm (raw %3$d)</string>
+    <string name="simbed_moving">Moving: %1$s</string>
+    <string name="simbed_fail_connect">Fail the next connection (ConnectTimeout)</string>
+    <string name="simbed_drop_link">Drop the connection now (S5)</string>
+</resources>
