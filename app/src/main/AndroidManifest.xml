@@ -38,7 +38,8 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/app_label_launcher">
+            android:label="@string/app_label_launcher"
+            android:theme="@style/Theme.LinakBed.Main">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
