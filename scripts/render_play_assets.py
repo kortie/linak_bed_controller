@@ -57,7 +57,7 @@ def gradient(size: tuple[int, int]) -> Image.Image:
 
 
 def bed_art(width: int) -> Image.Image:
-    art = render_splash.render()
+    art = render_splash.render(with_logos=False)
     art = art.crop(art.getchannel("A").getbbox())
     return art.resize((width, round(art.height * width / art.width)), Image.LANCZOS)
 
@@ -68,7 +68,7 @@ def feature_graphic() -> Image.Image:
     draw = ImageDraw.Draw(image)
     x = 72
     draw.text((x, 128), "침대리모컨", font=font(FONT_BOLD, 76), fill=WHITE)
-    draw.text((x, 240), "LINAK · 한샘 전동 침대를 휴대폰으로", font=font(FONT_MEDIUM, 30), fill=SUBTLE)
+    draw.text((x, 240), "LINAK · 일룸 전동 침대를 휴대폰으로", font=font(FONT_MEDIUM, 30), fill=SUBTLE)
     draw.text((x, 300), "모드 및 루틴으로 아침 기상 자세까지", font=font(FONT_MEDIUM, 30), fill=CYAN)
     art = bed_art(400)
     image.alpha_composite(art, (w - art.width - 64, (h - art.height) // 2 + 10))
