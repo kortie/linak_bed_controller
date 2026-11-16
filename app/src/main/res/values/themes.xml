@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 첫 화면(MainActivity) 테마: 시스템 스플래시 화면(Android 12+ SplashScreen)을 앱 아이콘과 같은 네이비 + 머리판을 올린 침대 그림으로 보인다 (그림은 scripts/render_splash.py, 최소 2초는 MainActivity).
+         창 배경도 네이비로 두어 스플래시 → 홈 사이에 흰 화면이 번쩍이지 않게 한다 (Compose 테마는 고정 다크, S10) -->
+    <style name="Theme.LinakBed.Main" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/brand_navy</item>
+        <item name="android:windowSplashScreenBackground">@color/brand_navy</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_icon</item>
+    </style>
+</resources>

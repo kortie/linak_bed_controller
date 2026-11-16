@@ -10,6 +10,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -47,6 +48,7 @@ import dev.linakbed.app.feature.pairing.PairingAction
 import dev.linakbed.app.feature.pairing.PairingEffects
 import dev.linakbed.app.feature.pairing.PairingUiState
 import dev.linakbed.app.feature.pairing.PairingViewModel
+import dev.linakbed.app.ui.LanguageToggle
 import dev.linakbed.app.ui.theme.LinakBedTheme
 
 /** 연결 안내 (ADR-009). 침대가 연결(페어링)되면 앱 루트가 홈으로 바꾼다. */
@@ -69,15 +71,17 @@ fun OnboardingScreen(
     BackHandler(enabled = state.step != OnboardingStep.INTRO) { viewModel.onAction(OnboardingAction.Back) }
     PairingEffects(pairingState, pairing::onAction, snackbar)
     Scaffold(snackbarHost = { SnackbarHost(snackbar) }) { padding ->
-        OnboardingContent(
-            state = state,
-            pairing = pairingState,
-            onStart = { viewModel.onAction(OnboardingAction.Start(context.hasBluetoothPermission())) },
-            onRequestPermission = { permission.launch(Manifest.permission.BLUETOOTH_CONNECT) },
-            onOpenAppSettings = { context.startActivity(appSettings(context)) },
-            onPairing = pairing::onAction,
-            modifier = Modifier.padding(padding),
-        )
+        Box(Modifier.padding(padding).fillMaxSize()) {
+            OnboardingContent(
+                state = state,
+                pairing = pairingState,
+                onStart = { viewModel.onAction(OnboardingAction.Start(context.hasBluetoothPermission())) },
+                onRequestPermission = { permission.launch(Manifest.permission.BLUETOOTH_CONNECT) },
+                onOpenAppSettings = { context.startActivity(appSettings(context)) },
+                onPairing = pairing::onAction,
+            )
+            LanguageToggle(Modifier.align(Alignment.TopEnd))
+        }
     }
 }
 

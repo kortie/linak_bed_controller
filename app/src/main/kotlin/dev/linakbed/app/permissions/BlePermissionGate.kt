@@ -8,6 +8,7 @@ import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -27,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.linakbed.app.R
+import dev.linakbed.app.ui.LanguageToggle
 import dev.linakbed.app.ui.theme.LinakBedTheme
 
 /** 블루투스 연결 권한(BLUETOOTH_CONNECT)이 있어야 [content]를 보여 준다. */
@@ -58,15 +60,18 @@ fun PermissionRationaleContent(
     onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier.fillMaxSize().padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(stringResource(R.string.permission_ble_title), style = MaterialTheme.typography.headlineSmall)
-        Text(stringResource(R.string.permission_ble_rationale), style = MaterialTheme.typography.bodyLarge)
-        Button(onClick = onRequest) { Text(stringResource(R.string.permission_ble_request)) }
-        OutlinedButton(onClick = onOpenSettings) { Text(stringResource(R.string.permission_open_settings)) }
+    Box(modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier.fillMaxSize().padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(stringResource(R.string.permission_ble_title), style = MaterialTheme.typography.headlineSmall)
+            Text(stringResource(R.string.permission_ble_rationale), style = MaterialTheme.typography.bodyLarge)
+            Button(onClick = onRequest) { Text(stringResource(R.string.permission_ble_request)) }
+            OutlinedButton(onClick = onOpenSettings) { Text(stringResource(R.string.permission_open_settings)) }
+        }
+        LanguageToggle(Modifier.align(Alignment.TopEnd))
     }
 }
 

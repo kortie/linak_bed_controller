@@ -60,6 +60,7 @@ import dev.linakbed.app.feature.preset.PresetDialogs
 import dev.linakbed.app.feature.preset.PresetUiState
 import dev.linakbed.app.feature.preset.PresetViewModel
 import dev.linakbed.app.feature.preset.presetMessage
+import dev.linakbed.app.ui.LanguageToggle
 import dev.linakbed.app.ui.StopButton
 import dev.linakbed.app.ui.glow.GlowButton
 import dev.linakbed.app.ui.message
@@ -182,6 +183,7 @@ fun HomeScaffold(
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                 title = { Text(stringResource(R.string.app_label_launcher)) },
                 actions = {
+                    LanguageToggle()
                     IconButton(onClick = onOpenSettings) {
                         Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.home_open_settings))
                     }
