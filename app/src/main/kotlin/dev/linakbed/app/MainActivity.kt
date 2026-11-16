@@ -10,6 +10,10 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.ui.Modifier
 import dagger.hilt.android.AndroidEntryPoint
 import dev.linakbed.app.navigation.AppRoot
 import dev.linakbed.app.navigation.RootState
@@ -30,7 +34,11 @@ class MainActivity : ComponentActivity() {
         )
         setContent {
             LinakBedTheme {
-                AppRoot(rootViewModel)
+                // 모든 화면에 테마 배경·글자색을 깐다: Scaffold 없는 화면(정보, 모드 및 루틴 등)도
+                // 기본 검은 글자색 대신 onBackground를 받는다 (창 배경은 스플래시용 네이비)
+                Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                    AppRoot(rootViewModel)
+                }
             }
         }
         // 언어 전환 등으로 다시 만들어질 땐(savedInstanceState 있음) 시스템 스플래시가 없으니 최소 시간도 두지 않는다
