@@ -12,7 +12,8 @@ android {
 
     defaultConfig {
         applicationId = "com.juanstudio.bedcontrol"
-        versionCode = 1
+        // versionCode = major * 10000 + minor * 100 + patch (1.0.0 -> 10000). 올릴 때마다 커져야 한다.
+        versionCode = 10000
         versionName = "1.0.0"
 
         // 정보 화면 (ADR-010)
