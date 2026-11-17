@@ -11,6 +11,9 @@ class FakeGattConnector : GattConnector {
     var connectStatus = 0
     var throwOnConnect: RuntimeException? = null
     var services: List<GattServiceInfo> = FakeGattServices.notifySensors()
+
+    /** 센서 읽기에 돌려줄 값 (연결마다 공유). 없으면 빈 값. */
+    val readValues = mutableMapOf<UUID, ByteArray>()
     val connections = mutableListOf<FakeGattConnection>()
     val last: FakeGattConnection get() = connections.last()
 
@@ -20,7 +23,7 @@ class FakeGattConnector : GattConnector {
     ): GattConnection? {
         throwOnConnect?.let { throw it }
         if (!returnsConnection) return null
-        val connection = FakeGattConnection(listener, services)
+        val connection = FakeGattConnection(listener, services, readValues)
         connections += connection
         if (respondToConnect) listener.onEvent(GattEvent.ConnectionStateChanged(connectStatus, connectStatus == 0))
         return connection
@@ -30,6 +33,7 @@ class FakeGattConnector : GattConnector {
 class FakeGattConnection(
     private val listener: GattEventListener,
     private val serviceList: List<GattServiceInfo>,
+    val readValues: MutableMap<UUID, ByteArray> = mutableMapOf(),
 ) : GattConnection {
     val calls = mutableListOf<String>()
     val writes = mutableListOf<Pair<ByteArray, Boolean>>()
@@ -38,7 +42,6 @@ class FakeGattConnection(
     var writeReturnCode = BluetoothStatusCodes.SUCCESS
     var writeStatus = 0
     var notifyStatus = 0
-    val readValues = mutableMapOf<UUID, ByteArray>()
     var closed = false
         private set
 

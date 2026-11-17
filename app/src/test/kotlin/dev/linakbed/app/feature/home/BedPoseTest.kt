@@ -1,6 +1,7 @@
 package dev.linakbed.app.feature.home
 
 import com.google.common.truth.Truth.assertThat
+import dev.linakbed.protocol.PresetSlot
 import org.junit.Test
 
 class BedPoseTest {
@@ -27,5 +28,19 @@ class BedPoseTest {
 
         assertThat(pose.head).isNull()
         assertThat(pose.known).isFalse()
+    }
+
+    @Test
+    fun `ADR-016 preset pictures are fixed - 1 flat, 2 slightly raised, 3 head high`() {
+        val flat = presetPicture(PresetSlot.P1)
+        val slight = presetPicture(PresetSlot.P2)
+        val high = presetPicture(PresetSlot.P3)
+
+        assertThat(flat).isEqualTo(BedPose(head = 0f, feet = 0f))
+        assertThat(slight.head).isGreaterThan(0f)
+        assertThat(slight.feet).isGreaterThan(0f)
+        assertThat(high.head).isGreaterThan(slight.head)
+        assertThat(PresetSlot.entries.map(::presetPicture)).isEqualTo(PresetSlot.entries.map(::presetPicture))
+        assertThat(listOf(flat, slight, high).all { it.known }).isTrue()
     }
 }

@@ -23,4 +23,9 @@ data class BleConfig(
     val operationTimeout: Duration = 5.seconds,
     /** 센서가 notify를 지원하지 않을 때 읽기 주기. */
     val sensorPollInterval: Duration = 500.milliseconds,
+    /**
+     * Stop을 보낸 뒤 notify 센서를 직접 다시 읽는 시점들 (ADR-016). 모터는 정지 뒤에도 관성으로 조금 더 움직이고,
+     * notify는 바뀔 때만 오므로 마지막 높이를 놓치면 홈 그림이 예전 높이에 머문다. 잠정값 — HW-ADR016에서 확인.
+     */
+    val afterStopReads: List<Duration> = listOf(500.milliseconds, 1500.milliseconds),
 )

@@ -49,7 +49,7 @@ class AndroidBedLinkTest {
     }
 
     @Test
-    fun `connects in order - discover then enable sensor notifications`() =
+    fun `connects in order - discover, enable sensor notifications, then read the current height once`() =
         runTest {
             val link = link(backgroundScope)
 
@@ -57,7 +57,9 @@ class AndroidBedLinkTest {
 
             assertThat(result).isEqualTo(BedResult.Ok(Unit))
             assertThat(link.state.value).isEqualTo(LinkState.Connected)
-            assertThat(connector.last.calls).containsExactly("discover", "notify:head", "notify:feet").inOrder()
+            assertThat(connector.last.calls)
+                .containsExactly("discover", "notify:head", "notify:feet", "read:head", "read:feet")
+                .inOrder()
             assertThat(link.services).isEqualTo(FakeGattServices.notifySensors())
         }
 
@@ -311,6 +313,81 @@ class AndroidBedLinkTest {
             assertThat(reading.actuator).isEqualTo(Actuator.HEAD)
             assertThat(reading.raw).isEqualTo(1000)
             assertThat(reading.cm).isWithin(1e-9).of(40.0)
+        }
+
+    @Test
+    fun `ADR-016 the height is known right after connecting without waiting for a notification`() =
+        runTest {
+            connector.readValues[LinakGatt.CHAR_HEAD] = byteArrayOf(0xe8.toByte(), 0x03)
+            connector.readValues[LinakGatt.CHAR_FEET] = byteArrayOf(0xe8.toByte(), 0x03)
+            val link = link(backgroundScope)
+            val readings = collectTelemetry(link)
+
+            link.connectDefault()
+            runCurrent()
+
+            assertThat(readings.map { it.actuator }).containsExactly(Actuator.HEAD, Actuator.FEET).inOrder()
+            assertThat(readings.first().raw).isEqualTo(1000)
+        }
+
+    @Test
+    fun `ADR-016 after Stop the sensors are read again so the final coasting height is not missed`() =
+        runTest {
+            val link = link(backgroundScope)
+            link.connectDefault()
+            val gatt = connector.last
+            val readsAfterConnect = gatt.calls.count { it.startsWith("read:") }
+            val readings = collectTelemetry(link)
+            gatt.readValues[LinakGatt.CHAR_HEAD] = byteArrayOf(0x10, 0x27)
+
+            link.write(BedCommand.Stop)
+            runCurrent()
+            assertThat(gatt.calls.count { it.startsWith("read:") }).isEqualTo(readsAfterConnect)
+
+            advanceTimeBy(500.milliseconds)
+            runCurrent()
+            assertThat(gatt.calls.count { it.startsWith("read:") }).isEqualTo(readsAfterConnect + 2)
+
+            advanceTimeBy(1.seconds)
+            runCurrent()
+            assertThat(gatt.calls.count { it.startsWith("read:") }).isEqualTo(readsAfterConnect + 4)
+            assertThat(readings.filter { it.actuator == Actuator.HEAD }.map { it.raw }).containsExactly(10_000, 10_000)
+
+            advanceTimeBy(10.seconds)
+            runCurrent()
+            assertThat(gatt.calls.count { it.startsWith("read:") }).isEqualTo(readsAfterConnect + 4)
+        }
+
+    @Test
+    fun `ADR-016 move and preset writes do not trigger extra sensor reads`() =
+        runTest {
+            val link = link(backgroundScope)
+            link.connectDefault()
+            val gatt = connector.last
+            val readsAfterConnect = gatt.calls.count { it.startsWith("read:") }
+
+            link.write(BedCommand.Move(Actuator.HEAD, Direction.UP))
+            link.write(BedCommand.RecallPreset(PresetSlot.P1))
+            advanceTimeBy(5.seconds)
+            runCurrent()
+
+            assertThat(gatt.calls.count { it.startsWith("read:") }).isEqualTo(readsAfterConnect)
+        }
+
+    @Test
+    fun `ADR-016 reads scheduled after Stop are dropped when the link closes`() =
+        runTest {
+            val link = link(backgroundScope)
+            link.connectDefault()
+            val gatt = connector.last
+            val readsAfterConnect = gatt.calls.count { it.startsWith("read:") }
+
+            link.write(BedCommand.Stop)
+            link.disconnect()
+            advanceTimeBy(5.seconds)
+            runCurrent()
+
+            assertThat(gatt.calls.count { it.startsWith("read:") }).isEqualTo(readsAfterConnect)
         }
 
     @Test

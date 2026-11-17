@@ -7,11 +7,9 @@ import dev.linakbed.domain.fake.FakeBedController
 import dev.linakbed.domain.fake.FakeBedLink
 import dev.linakbed.domain.fake.FakeBedLogger
 import dev.linakbed.domain.fake.FakePairingStore
-import dev.linakbed.domain.fake.FakePresetPoseStore
 import dev.linakbed.domain.model.PairedDevice
 import dev.linakbed.domain.port.LinkState
 import dev.linakbed.domain.port.PairingStore
-import dev.linakbed.domain.preset.PresetPose
 import dev.linakbed.protocol.LightAction
 import dev.linakbed.protocol.PresetSlot
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -24,30 +22,25 @@ import org.junit.jupiter.api.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class FleetTest {
     private val store = FakePairingStore(device = null)
-    private val poses = FakePresetPoseStore()
     private val controllers = mutableMapOf<String, FakeBedController>()
     private val links = mutableMapOf<String, ReadingLink>()
 
-    /** 프리셋 위치를 읽어 주는 가짜 링크. */
-    private class ReadingLink(
-        val presets: Map<PresetSlot, PresetPose>?,
-    ) : dev.linakbed.domain.port.BedLink by FakeBedLink() {
+    /** 연결 해제 횟수를 세는 가짜 링크. */
+    private class ReadingLink : dev.linakbed.domain.port.BedLink by FakeBedLink() {
         var disconnects = 0
 
         override suspend fun disconnect() {
             disconnects++
         }
-
-        override suspend fun readPresetPoses() = presets
     }
 
-    private fun TestScope.fleet(presets: Map<PresetSlot, PresetPose>? = null): BedFleet {
+    private fun TestScope.fleet(): BedFleet {
         val factory =
             BedPartsFactory { device, _ ->
-                val link = ReadingLink(presets).also { links[device.bedId] = it }
+                val link = ReadingLink().also { links[device.bedId] = it }
                 BedParts(link, FakeBedController().also { controllers[device.bedId] = it })
             }
-        return BedFleet(backgroundScope, store, factory, poses, FakeBedLogger()).also { runCurrent() }
+        return BedFleet(backgroundScope, store, factory, FakeBedLogger()).also { runCurrent() }
     }
 
     @Test
@@ -139,21 +132,6 @@ class FleetTest {
                     ?.source,
             ).isEqualTo(CommandSource.MANUAL)
             assertThat(fleet.all.status.value.link).isEqualTo(LinkState.Disconnected)
-        }
-
-    @Test
-    fun `preset values the bed can report are recorded when it connects`() =
-        runTest {
-            val presets = mapOf(PresetSlot.P2 to PresetPose(30.0, 10.0))
-            fleet(presets)
-            store.save(FakePairingStore.DEFAULT)
-            runCurrent()
-            assertThat(poses.of("bed-1")).isEmpty()
-
-            controllers.getValue("bed-1").status.value = BedStatus(link = LinkState.Connected)
-            runCurrent()
-
-            assertThat(poses.of("bed-1")).isEqualTo(presets)
         }
 
     @Test

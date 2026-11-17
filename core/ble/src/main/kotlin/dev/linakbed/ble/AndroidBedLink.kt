@@ -40,6 +40,7 @@ import kotlin.time.Duration
  * [DiagnosticBedLink] 구현 (Android GATT).
  *
  * 연결 절차: connect → discoverServices → 제어 특성 확인 → 센서 notify(미지원이면 읽기 폴링).
+ * notify 센서도 읽기를 지원하면 연결 직후와 Stop 뒤([BleConfig.afterStopReads])에 직접 읽어 마지막 높이를 놓치지 않는다 (ADR-016).
  * 어느 단계든 실패하면 연결을 닫고 [BedResult.Err]. 연결된 뒤 끊기면 진행 중 작업을 모두
  * [BedError.Disconnected]로 끝내고 [LinkState.Disconnected]를 낸다 (S5의 기반). 동작 재개는 하지 않는다.
  */
@@ -71,6 +72,11 @@ class AndroidBedLink(
     @Volatile
     private var connectedAddress: String? = null
     private var pollJob: Job? = null
+    private var refreshJob: Job? = null
+
+    /** notify와 읽기를 함께 지원하는 센서 — 연결 직후·Stop 뒤에 직접 읽는다 (ADR-016). */
+    @Volatile
+    private var refreshTargets: List<Pair<Actuator, UUID>> = emptyList()
 
     private val listener = GattEventListener(::onGattEvent)
 
@@ -114,7 +120,10 @@ class AndroidBedLink(
         }
     }
 
-    override suspend fun write(command: BedCommand): BedResult<Unit> = writeBytes(LinakCommandEncoder.encode(command), command.toString())
+    override suspend fun write(command: BedCommand): BedResult<Unit> =
+        writeBytes(LinakCommandEncoder.encode(command), command.toString()).also { result ->
+            if (command == BedCommand.Stop && result is BedResult.Ok) scheduleRefreshAfterStop()
+        }
 
     override suspend fun writeRaw(bytes: ByteArray): BedResult<Unit> = writeBytes(bytes.copyOf(), "raw")
 
@@ -166,6 +175,7 @@ class AndroidBedLink(
     /** 센서는 없어도 연결은 성공으로 본다 (높이 표시·정체 감지만 못 함). */
     private suspend fun setUpSensors(gatt: GattConnection) {
         val pollTargets = mutableListOf<Pair<Actuator, UUID>>()
+        val readable = mutableListOf<Pair<Actuator, UUID>>()
         for ((actuator, uuid) in SENSOR_CHARACTERISTICS) {
             val info = services.characteristic(LinakGatt.SERVICE_SENSOR, uuid)
             when {
@@ -176,11 +186,15 @@ class AndroidBedLink(
                             (it as? GattEvent.DescriptorWritten)?.takeIf { written -> written.characteristic == uuid }?.status
                         }
                     if (enabled is BedResult.Err) logger.warn(AREA, "sensor $actuator notify failed: ${enabled.error}")
+                    if (CharacteristicProperty.READ in info.properties) readable += actuator to uuid
                 }
                 CharacteristicProperty.READ in info.properties -> pollTargets += actuator to uuid
                 else -> logger.warn(AREA, "sensor $actuator has neither notify nor read")
             }
         }
+        refreshTargets = readable
+        // notify는 값이 바뀔 때만 오므로 지금 높이를 한 번 읽어 둔다 (ADR-016).
+        readSensors(gatt, readable)
         if (pollTargets.isNotEmpty()) {
             logger.info(AREA, "polling sensors ${pollTargets.map { it.first }} every ${config.sensorPollInterval}")
             pollJob = scope.launch { pollSensors(gatt, pollTargets) }
@@ -192,22 +206,48 @@ class AndroidBedLink(
         targets: List<Pair<Actuator, UUID>>,
     ) {
         while (currentCoroutineContext().isActive) {
-            for ((actuator, uuid) in targets) {
-                val read =
-                    queue.run(
-                        timeout = config.operationTimeout,
-                        timeoutError = BedError.GattFailure(GattStage.READ, null),
-                        start = { guard { if (gatt.readCharacteristic(LinakGatt.SERVICE_SENSOR, uuid)) null else readFailure() } },
-                        matcher = { event ->
-                            (event as? GattEvent.CharacteristicRead)?.takeIf { it.characteristic == uuid }?.let {
-                                GattStatusMapper.fromStageStatus(GattStage.READ, it.status).orOk(it.value)
-                            }
-                        },
-                    )
-                if (read is BedResult.Ok) publishReading(actuator, read.value)
-            }
+            readSensors(gatt, targets)
             delay(config.sensorPollInterval)
         }
+    }
+
+    /** 센서를 한 번씩 읽어 telemetry로 낸다. 읽기 실패는 다음 읽기·notify에 맡긴다. */
+    private suspend fun readSensors(
+        gatt: GattConnection,
+        targets: List<Pair<Actuator, UUID>>,
+    ) {
+        for ((actuator, uuid) in targets) {
+            val read =
+                queue.run(
+                    timeout = config.operationTimeout,
+                    timeoutError = BedError.GattFailure(GattStage.READ, null),
+                    start = { guard { if (gatt.readCharacteristic(LinakGatt.SERVICE_SENSOR, uuid)) null else readFailure() } },
+                    matcher = { event ->
+                        (event as? GattEvent.CharacteristicRead)?.takeIf { it.characteristic == uuid }?.let {
+                            GattStatusMapper.fromStageStatus(GattStage.READ, it.status).orOk(it.value)
+                        }
+                    },
+                )
+            if (read is BedResult.Ok) publishReading(actuator, read.value)
+        }
+    }
+
+    /** Stop 뒤 관성으로 움직인 마지막 높이를 받기 위해 [BleConfig.afterStopReads] 시점마다 다시 읽는다. 새 Stop이 오면 처음부터. */
+    private fun scheduleRefreshAfterStop() {
+        val gatt = connection ?: return
+        val targets = refreshTargets
+        if (targets.isEmpty()) return
+        refreshJob?.cancel()
+        refreshJob =
+            scope.launch {
+                var waited = Duration.ZERO
+                for (at in config.afterStopReads) {
+                    delay(at - waited)
+                    waited = at
+                    if (state.value != LinkState.Connected || connection !== gatt) return@launch
+                    readSensors(gatt, targets)
+                }
+            }
     }
 
     private suspend fun writeBytes(
@@ -286,6 +326,9 @@ class AndroidBedLink(
         queue.close(BedError.Disconnected)
         pollJob?.cancel()
         pollJob = null
+        refreshJob?.cancel()
+        refreshJob = null
+        refreshTargets = emptyList()
         connection?.let { gatt ->
             guard {
                 gatt.disconnect()

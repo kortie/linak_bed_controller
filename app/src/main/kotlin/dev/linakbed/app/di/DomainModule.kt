@@ -9,7 +9,6 @@ import dagger.hilt.components.SingletonComponent
 import dev.linakbed.data.log.RoomExecutionLog
 import dev.linakbed.data.pairing.DataStorePairingStore
 import dev.linakbed.data.preset.DataStorePresetNameStore
-import dev.linakbed.data.preset.DataStorePresetPoseStore
 import dev.linakbed.data.settings.DataStoreRemoteSettingsStore
 import dev.linakbed.domain.controller.BedActions
 import dev.linakbed.domain.controller.BedControllerConfig
@@ -23,7 +22,6 @@ import dev.linakbed.domain.port.Clock
 import dev.linakbed.domain.port.ExecutionLog
 import dev.linakbed.domain.port.PairingStore
 import dev.linakbed.domain.port.PresetNameStore
-import dev.linakbed.domain.port.PresetPoseStore
 import dev.linakbed.domain.port.RemoteSettingsStore
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Singleton
@@ -75,24 +73,17 @@ object DomainModule {
             BedParts(link, DefaultBedController(scope, link, source, executionLog, BedControllerConfig(), environment))
         }
 
-    /** 연결한 침대들: 침대마다 부품 + 프리셋 자세 기록 (ADR-012). */
+    /** 연결한 침대들: 침대마다 부품 (ADR-012). */
     @Provides
     @Singleton
     fun provideBedFleet(
         @ApplicationScope scope: CoroutineScope,
         pairingStore: PairingStore,
         parts: BedPartsFactory,
-        presetPoses: PresetPoseStore,
         environment: ControllerEnvironment,
-    ): BedFleet = BedFleet(scope, pairingStore, parts, presetPoses, environment.logger)
+    ): BedFleet = BedFleet(scope, pairingStore, parts, environment.logger)
 
     /** 원격 명령·전체 STOP: 모든 침대 (ADR-012). */
     @Provides
     fun provideAllBeds(fleet: BedFleet): BedActions = fleet.all
-
-    @Provides
-    @Singleton
-    fun providePresetPoseStore(
-        @ApplicationContext context: Context,
-    ): PresetPoseStore = DataStorePresetPoseStore.create(context)
 }

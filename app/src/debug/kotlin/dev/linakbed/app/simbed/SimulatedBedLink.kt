@@ -6,12 +6,8 @@ import dev.linakbed.domain.log.BedLogger
 import dev.linakbed.domain.log.info
 import dev.linakbed.domain.port.BedLink
 import dev.linakbed.domain.port.LinkState
-import dev.linakbed.domain.preset.PresetPose
-import dev.linakbed.protocol.Actuator
 import dev.linakbed.protocol.BedCommand
 import dev.linakbed.protocol.HeightReading
-import dev.linakbed.protocol.LinakSensorDecoder
-import dev.linakbed.protocol.PresetSlot
 import dev.linakbed.protocol.ProtocolProfile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -41,7 +37,6 @@ class SimulatedBedLink(
     )
 
     private val bed = SimulatedBed(profile)
-    private val calibration get() = profile.calibration
     private val lock = Mutex()
     private var nowMs = 0L
 
@@ -115,15 +110,6 @@ class SimulatedBedLink(
         }
         return BedResult.Ok(Unit)
     }
-
-    /** 가상 침대에 설정된 프리셋 위치 — 실제 침대와 달리 읽어 줄 수 있다 (S13). */
-    override suspend fun readPresetPoses(): Map<PresetSlot, PresetPose> =
-        lock.withLock { bed.snapshot(nowMs).presets }.mapValues { (_, position) ->
-            PresetPose(
-                headCm = LinakSensorDecoder.fromRaw(Actuator.HEAD, position.head, null, calibration).cm,
-                feetCm = LinakSensorDecoder.fromRaw(Actuator.FEET, position.feet, null, calibration).cm,
-            )
-        }
 
     companion object {
         /** 이 접두어로 시작하는 주소면 가상 침대로 연결한다. MAC 형식이 아니라 실제 기기와 겹치지 않는다. */

@@ -199,7 +199,6 @@
     <!-- S12 프리셋 그림 · Custom -->
     <string name="preset_custom">Custom</string>
     <string name="preset_icon">프리셋 %1$d</string>
-    <string name="preset_icon_unknown">프리셋 %1$d, 자세 모름</string>
 
     <!-- S13 침대 여러 대 -->
     <string name="pairing_add">침대 추가</string>

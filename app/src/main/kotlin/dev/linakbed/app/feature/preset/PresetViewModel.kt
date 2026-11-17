@@ -13,11 +13,8 @@ import dev.linakbed.domain.controller.BedController
 import dev.linakbed.domain.controller.BedFleet
 import dev.linakbed.domain.controller.CommandSource
 import dev.linakbed.domain.port.PresetNameStore
-import dev.linakbed.domain.port.PresetPoseStore
 import dev.linakbed.domain.preset.PresetName
-import dev.linakbed.domain.preset.PresetPose
 import dev.linakbed.protocol.PresetSlot
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,17 +28,15 @@ class PresetViewModel(
     /** STOP은 모든 침대를 멈춘다 (ADR-012). */
     private val stopAll: BedActions,
     private val nameStore: PresetNameStore,
-    poses: Flow<Map<PresetSlot, PresetPose>>,
 ) : ViewModel() {
-    /** 카드 하나 = 침대 한 대 (S13). 프리셋 그림·Custom 저장은 침대별. */
+    /** 카드 하나 = 침대 한 대 (S13). Custom 저장은 침대별. */
     @AssistedInject
     constructor(
         @Assisted bedId: String,
         fleet: BedFleet,
         all: BedActions,
         nameStore: PresetNameStore,
-        poseStore: PresetPoseStore,
-    ) : this(fleet.controller(bedId) ?: UnavailableBed, all, nameStore, poseStore.poses(bedId))
+    ) : this(fleet.controller(bedId) ?: UnavailableBed, all, nameStore)
 
     @AssistedFactory
     interface Factory {
@@ -53,7 +48,6 @@ class PresetViewModel(
 
     init {
         viewModelScope.launch { nameStore.names().collect { names -> mutableState.update { it.copy(names = names) } } }
-        viewModelScope.launch { poses.collect { poses -> mutableState.update { it.copy(poses = poses) } } }
         viewModelScope.launch {
             controller.status.collect { status -> mutableState.update { it.copy(running = status.activeMotion?.preset) } }
         }

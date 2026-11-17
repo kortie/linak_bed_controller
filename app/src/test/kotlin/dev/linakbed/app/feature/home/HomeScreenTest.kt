@@ -26,7 +26,6 @@ import dev.linakbed.app.feature.preset.PresetAction
 import dev.linakbed.app.feature.preset.PresetUiState
 import dev.linakbed.app.ui.theme.LinakBedTheme
 import dev.linakbed.domain.port.LinkState
-import dev.linakbed.domain.preset.PresetPose
 import dev.linakbed.protocol.Actuator
 import dev.linakbed.protocol.Direction
 import dev.linakbed.protocol.LightAction
@@ -122,7 +121,7 @@ class HomeScreenTest {
             down(center)
             up()
         }
-        compose.onNodeWithContentDescription("프리셋 1, 자세 모름").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("프리셋 1").performScrollTo().performClick()
         compose.onNodeWithText("조명 · 알 수 없음").performScrollTo().assertIsNotEnabled()
         compose.onNodeWithContentDescription("침대 정지").assertIsEnabled().performClick()
 
@@ -150,7 +149,7 @@ class HomeScreenTest {
 
     @Test
     fun `tapping a preset recalls it, light toggles`() {
-        show(presets = PresetUiState(poses = mapOf(PresetSlot.P2 to PresetPose(30.0, 10.0))))
+        show()
 
         compose.onNodeWithContentDescription("프리셋 2").performScrollTo().performClick()
         compose.onNodeWithText("조명 · 알 수 없음").performScrollTo().performClick()
@@ -160,12 +159,12 @@ class HomeScreenTest {
     }
 
     @Test
-    fun `S12 presets 1 to 3 are pictures, preset 4 is Custom, names are not shown`() {
-        show(presets = PresetUiState(names = mapOf(PresetSlot.P1 to "기상"), poses = mapOf(PresetSlot.P1 to PresetPose(20.0, 0.0))))
+    fun `S12 presets 1 to 3 are fixed pictures, preset 4 is Custom, names are not shown`() {
+        show(presets = PresetUiState(names = mapOf(PresetSlot.P1 to "기상")))
 
         compose.onNodeWithContentDescription("프리셋 1").assertExists()
-        compose.onNodeWithContentDescription("프리셋 2, 자세 모름").assertExists()
-        compose.onNodeWithContentDescription("프리셋 3, 자세 모름").assertExists()
+        compose.onNodeWithContentDescription("프리셋 2").assertExists()
+        compose.onNodeWithContentDescription("프리셋 3").assertExists()
         compose.onNodeWithText("Custom").assertExists()
         compose.onNodeWithText("기상").assertDoesNotExist()
         compose.onNodeWithText("프리셋 4").assertDoesNotExist()
@@ -185,7 +184,7 @@ class HomeScreenTest {
     fun `S12 presets 1 to 3 cannot be saved from the app`() {
         show()
 
-        compose.onNodeWithContentDescription("프리셋 3, 자세 모름").performScrollTo().performTouchInput { longClick() }
+        compose.onNodeWithContentDescription("프리셋 3").performScrollTo().performTouchInput { longClick() }
         compose.waitForIdle()
 
         // 길게 눌러도 일반 탭처럼 그 프리셋으로 이동할 뿐, 저장 메뉴는 없다.

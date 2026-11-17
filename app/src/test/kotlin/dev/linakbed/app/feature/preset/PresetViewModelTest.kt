@@ -9,9 +9,7 @@ import dev.linakbed.domain.controller.CommandSource
 import dev.linakbed.domain.controller.MotionKind
 import dev.linakbed.domain.fake.FakeBedController
 import dev.linakbed.domain.fake.FakePresetNameStore
-import dev.linakbed.domain.fake.FakePresetPoseStore
 import dev.linakbed.domain.preset.PresetName
-import dev.linakbed.domain.preset.PresetPose
 import dev.linakbed.protocol.PresetSlot
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -30,13 +28,12 @@ class PresetViewModelTest {
     private val controller = FakeBedController()
     private val allBeds = FakeBedController()
     private val names = FakePresetNameStore()
-    private val poses = FakePresetPoseStore()
     private lateinit var viewModel: PresetViewModel
 
     @Before
     fun setUp() {
         Dispatchers.setMain(dispatcher)
-        viewModel = PresetViewModel(controller, allBeds, names, poses.poses("bed-1"))
+        viewModel = PresetViewModel(controller, allBeds, names)
     }
 
     @After
@@ -152,14 +149,5 @@ class PresetViewModelTest {
             runCurrent()
             assertThat(allBeds.calls).containsExactly("stop MANUAL")
             assertThat(controller.calls).isEmpty()
-        }
-
-    @Test
-    fun `recorded preset poses are shown`() =
-        runTest(dispatcher) {
-            poses.record("bed-1", PresetSlot.P2, PresetPose(30.0, 12.0))
-            runCurrent()
-
-            assertThat(state.poses).containsExactly(PresetSlot.P2, PresetPose(30.0, 12.0))
         }
 }

@@ -11,7 +11,6 @@ import dev.linakbed.domain.fake.FakeBedLogger
 import dev.linakbed.domain.fake.FakeClock
 import dev.linakbed.domain.fake.FakeExecutionLog
 import dev.linakbed.domain.fake.FakePairingStore
-import dev.linakbed.domain.preset.PresetPose
 import dev.linakbed.domain.safety.SafetyConfig
 import dev.linakbed.domain.safety.SafetyReason
 import dev.linakbed.protocol.Actuator
@@ -103,17 +102,5 @@ class SimulatedBedControllerTest {
             val result = controller.goToPreset(PresetSlot.P1, CommandSource.MANUAL)
 
             assertThat(result).isEqualTo(BedResult.Err(BedError.ConnectTimeout))
-        }
-
-    @Test
-    fun `S13 the virtual bed reports its configured preset positions`() =
-        runTest {
-            val (link, _) = setUp()
-
-            val poses = link.readPresetPoses()
-
-            assertThat(poses[PresetSlot.P1]).isEqualTo(PresetPose(0.0, 0.0))
-            assertThat(poses[PresetSlot.P2]).isEqualTo(PresetPose(30.0, 10.0))
-            assertThat(poses[PresetSlot.P3]).isEqualTo(PresetPose(60.0, 0.0))
         }
 }

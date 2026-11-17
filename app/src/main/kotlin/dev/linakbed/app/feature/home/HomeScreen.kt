@@ -233,7 +233,6 @@ fun BedCard(
             }
             DeviceControls(control, onControl)
             PresetGrid(
-                poses = presets.poses,
                 running = control.runningPreset,
                 enabled = control.controlsEnabled,
                 onRecall = { onPreset(PresetAction.Recall(it)) },
