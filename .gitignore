@@ -14,8 +14,12 @@ keystore.properties
 *.keystore
 
 # 설계·스펙 문서와 Claude 작업 설정은 로컬에만 둔다 (README.md만 저장소에 올림)
-docs/
+docs/*
 CLAUDE.md
+# 단, GitHub Pages(main /docs)로 게시하는 개인정보 처리방침 페이지는 올린다
+!docs/index.html
+!docs/privacy.html
+!docs/.nojekyll
 .claude/
 
 # IDE(VS Code Java 등)가 만드는 컴파일 출력

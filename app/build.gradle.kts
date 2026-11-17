@@ -19,8 +19,8 @@ android {
         // 정보 화면 (ADR-010)
         buildConfigField("String", "DEVELOPER_NAME", "\"juanStudio\"")
         buildConfigField("String", "DEVELOPER_EMAIL", "\"kortie00@gmail.com\"")
-        // 개인정보 처리방침 공개 URL (Play 등록 시 필요). 비어 있으면 정보 화면에 링크를 표시하지 않는다.
-        buildConfigField("String", "PRIVACY_POLICY_URL", "\"\"")
+        // 개인정보 처리방침 공개 URL (Play 등록 시 필요, docs/privacy.html을 GitHub Pages로 게시). 비어 있으면 정보 화면에 링크를 표시하지 않는다.
+        buildConfigField("String", "PRIVACY_POLICY_URL", "\"https://kortie.github.io/linak_bed_controller/privacy.html\"")
 
         // 커피 한 잔 후원 (ADR-014): Play Console의 소모성 인앱 상품 ID. 바꾸면 Play Console 상품도 같이.
         buildConfigField("String", "DONATION_PRODUCT_ID", "\"coffee\"")
